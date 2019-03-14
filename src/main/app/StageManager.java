@@ -25,7 +25,7 @@ public class StageManager {
 	 */
 	protected static void initialize(Stage stage) throws IOException {
 		StageManager.stage = stage;
-//		StageManager.icon = new Image(StageManager.class.getClassLoader().getResourceAsStream("icons/logo_transparent.png"));
+		StageManager.icon = new Image(StageManager.class.getClassLoader().getResourceAsStream("icons/logo.png"));
 		StageManager.viewToScene = new EnumMap<>(View.class);
 		
 		// Preloading all FXML files
@@ -47,7 +47,7 @@ public class StageManager {
 		stage = new Stage();
 		stage.setScene(scene);
 		stage.setTitle(view.getTitle());
-//		stage.getIcons().add(icon);
+		stage.getIcons().add(icon);
 		stage.sizeToScene();
 		stage.centerOnScreen();
 		
