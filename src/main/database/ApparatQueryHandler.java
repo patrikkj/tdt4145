@@ -7,7 +7,6 @@ import main.models.Apparat;
 
 public class ApparatQueryHandler {
 	
-	
 	public static Apparat extractApparatFromResultSet(ResultSet resultSet) throws SQLException {
 	    int apparatID = resultSet.getInt("apparatID");
 	    String navn = resultSet.getString("navn");
