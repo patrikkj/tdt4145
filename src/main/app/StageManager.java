@@ -3,9 +3,15 @@ package main.app;
 import java.io.IOException;
 import java.util.EnumMap;
 
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXDialog.DialogTransition;
+
 import javafx.scene.Scene;
 import javafx.scene.image.Image;
+import javafx.scene.layout.Region;
+import javafx.scene.layout.StackPane;
 import javafx.stage.Stage;
+import main.core.ui.popups.AbstractPopupController;
 import main.utils.Refreshable;
 import main.utils.View;
 
@@ -36,7 +42,7 @@ public class StageManager {
 	 * Sets the FXML node to be displayed on screen, specified by {@code view}. 
 	 * Closes the previous stage and creates a new one.
 	 */
-	public static void loadView(View view) {
+	public static void displayView(View view) {
 		// Close previous stage
 		stage.close();
 		
@@ -60,6 +66,28 @@ public class StageManager {
 		
 		stage.show();
 	}
+	
+	
+	
+	/**
+	 * Sets the FXML node to be displayed on screen, specified by {@code view}. 
+	 * Closes the previous stage and creates a new one.
+	 */
+	public static JFXDialog createPopupDialog(StackPane container, View view) {
+		if (!(Loader.getController(view) instanceof AbstractPopupController))
+			throw new IllegalArgumentException(String.format("Failed to create popup from '%s', view has to be a subclass of '%s'.", 
+					view, AbstractPopupController.class.getSimpleName()));
+		
+		JFXDialog dialog = new JFXDialog(container, (Region) Loader.getParent(view), DialogTransition.CENTER);
+		
+		// Clear and configure controller
+		AbstractPopupController controller = Loader.getController(view);
+		controller.clear();
+		controller.connectDialog(dialog);
+		return dialog;
+	}
+	
+	
 	
 	/**
 	 * Returns the {@link Scene} object associated with given {@link View}.

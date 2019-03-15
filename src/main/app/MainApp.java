@@ -14,7 +14,7 @@ public class MainApp extends Application {
 	@Override
 	public void start(Stage stage) throws IOException {
 		StageManager.initialize(stage);
-		StageManager.loadView(View.HOVEDSIDE);
+		StageManager.displayView(View.HOVEDSIDE);
 	}
 	
 	@Override

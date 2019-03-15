@@ -1,8 +1,8 @@
 package main.utils;
 
 public enum View {
-	// 							TITLE			Load on startup		FXML path
-	HOVEDSIDE(					"iExercise",	true,				"ui/Hovedside.fxml");
+	// 							TITLE			Type				FXML path
+	HOVEDSIDE(					"iExercise",	ViewType.SCENE,		"ui/Hovedside.fxml");
 //	POPUP_APPARAT(				null, 			true,				"ui/popups/ApparatPopup.fxml"), 
 //	POPUP_ØVELSE(				null,			true,				"ui/popups/ØvelsePopup.fxml"), 
 //	POPUP_TRENINGSØKT(			null, 			true,				"ui/popups/TreningsøktPopup.fxml"),
@@ -11,12 +11,12 @@ public enum View {
 	
 	
 	private final String title;
-	private final boolean loadOnStartup;
+	private final ViewType viewType;
 	private final String pathToFXML;
 	
-	private View(String title, boolean loadOnStartup, String pathToFXML) {
+	private View(String title, ViewType viewType, String pathToFXML) {
 		this.title = title;
-		this.loadOnStartup = loadOnStartup;
+		this.viewType = viewType;
 		this.pathToFXML = pathToFXML;
 	}
 	
@@ -24,12 +24,17 @@ public enum View {
 		return title;
 	}
 	
-	public boolean isLoadOnStartup() {
-		return loadOnStartup;
+	public ViewType getViewType() {
+		return viewType;
 	}
 	
 	public String getPathToFXML() {
 		return pathToFXML;
+	}
+	
+	
+	public enum ViewType {
+		SCENE, POPUP, COMPONENT, TAB; 
 	}
 	
 }
