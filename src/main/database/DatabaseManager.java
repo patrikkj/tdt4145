@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.List;
+import java.util.concurrent.Callable;
 
 import javafx.util.Pair;
 import main.app.MainApp;
@@ -32,7 +34,7 @@ public class DatabaseManager {
 	/**
 	 * Returns a new {@link PreparedStatement} representing the {@code statement} specified.
 	 */
-	protected static PreparedStatement getPreparedStatement(String statement) {
+	public static PreparedStatement getPreparedStatement(String statement) {
 		PreparedStatement preparedStatement = null;
 		try {
 			preparedStatement = connection.prepareStatement(statement);
@@ -47,82 +49,69 @@ public class DatabaseManager {
 	/*
 	 * Sends query and reestablishes connection if lost.
 	 */
+	public static List<Record> executeQuery(String query) {
+		ResultSet resultSet = executeTimedQuery(query);
+		return Record.generateRecords(resultSet);
+	}	
+
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	public static List<Record> executeQuery(PreparedStatement preparedStatement) {
+		ResultSet resultSet = executeTimedQuery(preparedStatement);
+		return Record.generateRecords(resultSet);
+	}
+
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	public static List<Record> executeQuery(String preparedStatement, Object... args) {
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, args));
+		return Record.generateRecords(resultSet);
+	}
+	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
 	@SafeVarargs
-	protected static <T> ResultSet executeQuery(String preparedStatement, Pair<Class<T>, T>... pairs) {
-		return executeTimedQuery(prepareStatement(preparedStatement, pairs));
+	public static <T> List<Record> executeQuery(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, pairs));
+		return Record.generateRecords(resultSet);
 	}
 
-	/*
-	 * Sends query and reestablishes connection if lost.
-	 */
-	protected static ResultSet executeQuery(String preparedStatement, Object... args) {
-		return executeTimedQuery(prepareStatement(preparedStatement, args));
-	}
-	
-	/*
-	 * Sends query and reestablishes connection if lost.
-	 */
-	protected static ResultSet executeQuery(PreparedStatement preparedStatement) {
-		return executeTimedQuery(preparedStatement);
-	}
-
-	/*
-	 * Sends query and reestablishes connection if lost.
-	 */
-	protected static ResultSet executeQuery(String query) {
-		return executeTimedQuery(query);
-	}
-	
 	
 	// Updates
 	/*
-	 * Sends query and reestablishes connection if lost.
+	 * Sends update and reestablishes connection if lost.
 	 */
-	@SafeVarargs
-	protected static <T> int executeUpdate(String preparedStatement, Pair<Class<T>, T>... pairs) {
-		return executeTimedUpdate(prepareStatement(preparedStatement, pairs));
+	public static int executeUpdate(String update) {
+		return executeTimedUpdate(update);
+	}
+
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeUpdate(PreparedStatement preparedStatement) {
+		return executeTimedUpdate(preparedStatement);
 	}
 
 	/*
 	 * Sends query and reestablishes connection if lost.
 	 */
-	protected static int executeUpdate(String preparedStatement, Object... args) {
+	public static int executeUpdate(String preparedStatement, Object... args) {
 		return executeTimedUpdate(prepareStatement(preparedStatement, args));
 	}
 	
 	/*
-	 * Sends update and reestablishes connection if lost.
+	 * Sends query and reestablishes connection if lost.
 	 */
-	protected static int executeUpdate(PreparedStatement preparedStatement) {
-		return executeTimedUpdate(preparedStatement);
-	}
-	
-	/*
-	 * Sends update and reestablishes connection if lost.
-	 */
-	protected static int executeUpdate(String update) {
-		return executeTimedUpdate(update);
-	}
-	
-	
-	// Private
-	/**
-	 * Executes query specified by {@code preparedStatement} and prints execution time to console.
-	 * Reattempts once if first execution fails.
-	 */
-	private static ResultSet executeTimedQuery(PreparedStatement preparedStatement) {
-		ResultSet resultSet = null;
-		
-		try {
-			resultSet = DatabaseUtil.executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
-		} catch (RuntimeException e) {
-			openConnection();
-			resultSet = DatabaseUtil.executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
-		}
-		
-		return resultSet;
+	@SafeVarargs
+	public static <T> int executeUpdate(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		return executeTimedUpdate(prepareStatement(preparedStatement, pairs));
 	}
 
+	
+	// Private
 	/**
 	 * Executes query specified by {@code query} and prints execution time to console.
 	 * Reattempts once if first execution fails.
@@ -132,16 +121,54 @@ public class DatabaseManager {
 		
 		try (Statement statement = connection.createStatement()) {
 			try {
-				resultSet = DatabaseUtil.executeWithTimer(() -> statement.executeQuery(query), statement);
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), statement);
 			} catch (RuntimeException e) {
 				openConnection();
-				resultSet = DatabaseUtil.executeWithTimer(() -> statement.executeQuery(query), statement);
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), statement);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
 		}
 		
 		return resultSet;
+	}
+	
+	/**
+	 * Executes query specified by {@code preparedStatement} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static ResultSet executeTimedQuery(PreparedStatement preparedStatement) {
+		ResultSet resultSet = null;
+		
+		try {
+			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
+		} catch (RuntimeException e) {
+			openConnection();
+			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
+		}
+		
+		return resultSet;
+	}
+
+	/**
+	 * Executes update specified by {@code query} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static int executeTimedUpdate(String update) {
+		int linesChanged = 0;
+
+		try (Statement statement = connection.createStatement()) {
+			try {
+				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), statement);
+			} catch (RuntimeException e) {
+				openConnection();
+				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), statement);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+		return linesChanged;
 	}
 	
 	/**
@@ -152,34 +179,29 @@ public class DatabaseManager {
 		int linesChanged;
 		
 		try {
-			linesChanged = DatabaseUtil.executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
 		} catch (RuntimeException e) {
 			openConnection();
-			linesChanged = DatabaseUtil.executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
 		}
 		
 		return linesChanged;
 	}	
 	
 	/**
-	 * Executes update specified by {@code query} and prints execution time to console.
-	 * Reattempts once if first execution fails.
+	 * Wraps {@code Callable} in a timer, used for estimating statement execution time.
 	 */
-	private static int executeTimedUpdate(String update) {
-		int linesChanged = 0;
-
-		try (Statement statement = connection.createStatement()) {
-			try {
-				linesChanged = DatabaseUtil.executeWithTimer(() -> statement.executeUpdate(update), statement);
-			} catch (RuntimeException e) {
-				openConnection();
-				linesChanged = DatabaseUtil.executeWithTimer(() -> statement.executeUpdate(update), statement);
-			}
-		} catch (SQLException e1) {
-			e1.printStackTrace();
+	private static <T> T executeWithTimer(Callable<T> callable, Statement statement) {
+		T result = null;
+		try {
+			long start = System.nanoTime();
+			result = callable.call();
+			long end = System.nanoTime();
+			System.out.format("\tTime: %9.9s seconds   Query: %s%n", (end - start) / Math.pow(10, 9), statement);
+		} catch (Exception e) {
+			throw new RuntimeException(e);
 		}
-		
-		return linesChanged;
+		return result;
 	}
 	
 	/*

@@ -11,4 +11,5 @@ module iexercise {
 	requires transitive javafx.graphics;
 	requires transitive javafx.controls;
 	requires com.jfoenix;
+	requires java.desktop;
 }

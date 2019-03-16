@@ -70,13 +70,10 @@ public class Loader implements Runnable {
 	private void checkView(View view, FXMLLoader loader) {
 		switch (view) {
 		case HOVEDSIDE:
-			
 			break;
-
 		default:
 			break;
 		}
-		
 	}
 
 

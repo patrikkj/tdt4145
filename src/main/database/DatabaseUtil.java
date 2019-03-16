@@ -1,20 +1,21 @@
 package main.database;
 
+import java.math.BigDecimal;
 import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.sql.Time;
+import java.sql.Timestamp;
 import java.sql.Types;
 import java.time.LocalDate;
 import java.time.LocalTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.concurrent.Callable;
 
 public class DatabaseUtil {
-	private static final Map<Class<?>, Integer> mapToSQL = new HashMap<>();
+	protected static final Map<Class<?>, Integer> mapToSQL = new HashMap<>();
 	static {
+		
 		mapToSQL.put(String.class, Types.VARCHAR);
 		mapToSQL.put(Double.class, Types.DECIMAL);
 		mapToSQL.put(Integer.class, Types.INTEGER);
@@ -23,6 +24,29 @@ public class DatabaseUtil {
 		mapToSQL.put(LocalDate.class, Types.DATE);
 		mapToSQL.put(Time.class, Types.TIME);
 		mapToSQL.put(LocalTime.class, Types.TIME);
+	}
+	
+	protected static final Map<String, Class<?>> mapToClass = new HashMap<>();
+	static {
+		mapToClass.put("CHAR", String.class);
+		mapToClass.put("VARCHAR", String.class);
+		mapToClass.put("LONGVARCHAR", String.class);
+		mapToClass.put("NUMERIC", BigDecimal.class);
+		mapToClass.put("DECIMAL", BigDecimal.class);
+		mapToClass.put("BIT", Boolean.class);
+		mapToClass.put("TINYINT", Integer.class);
+		mapToClass.put("SMALLINT", Integer.class);
+		mapToClass.put("INTEGER", Integer.class);
+		mapToClass.put("BIGINT", Long.class);
+		mapToClass.put("REAL", Float.class);
+		mapToClass.put("FLOAT", Double.class);
+		mapToClass.put("DOUBLE", Double.class);
+		mapToClass.put("BINARY", byte[].class);
+		mapToClass.put("VARBINARY", byte[].class);
+		mapToClass.put("LONGVARBINARY", byte[].class);
+		mapToClass.put("DATE", Date.class);
+		mapToClass.put("TIME", Time.class);
+		mapToClass.put("TIMESTAMP", Timestamp.class);
 	}
 	
 	protected static void setStatementArgument(PreparedStatement preparedStatement, Object arg, Class<?> type, int paramIndex) throws SQLException {
@@ -48,19 +72,6 @@ public class DatabaseUtil {
 	
 	protected static Integer classToSQLType(Class<?> classType) {
 		return mapToSQL.getOrDefault(classType, Types.VARCHAR);
-	}
-	
-	protected static <T> T executeWithTimer(Callable<T> callable, Statement statement) {
-		T result = null;
-		try {
-			long start = System.nanoTime();
-			result = callable.call();
-			long end = System.nanoTime();
-			System.out.format("\tTime: %9.9s seconds   Query: %s%n", (end - start) / Math.pow(10, 9), statement);
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-		return result;
 	}
 	
 }

@@ -67,8 +67,6 @@ public class StageManager {
 		stage.show();
 	}
 	
-	
-	
 	/**
 	 * Sets the FXML node to be displayed on screen, specified by {@code view}. 
 	 * Closes the previous stage and creates a new one.
@@ -86,8 +84,6 @@ public class StageManager {
 		controller.connectDialog(dialog);
 		return dialog;
 	}
-	
-	
 	
 	/**
 	 * Returns the {@link Scene} object associated with given {@link View}.
