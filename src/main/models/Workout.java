@@ -87,4 +87,10 @@ public class Workout {
 	public void setNote(Note note) {
 		this.note = note;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Workout [workoutID=%s, date=%s, time=%s, duration=%s, shape=%s, performance=%s, note=%s]",
+				workoutID, date, time, duration, shape, performance, note);
+	}
 }

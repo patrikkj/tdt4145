@@ -1,4 +1,4 @@
-package main.relations;
+package main.models.relations;
 
 import main.models.Exercise;
 import main.models.Workout;
@@ -32,46 +32,37 @@ public class ExercisePerformed {
 		return exercisePerformedID;
 	}
 
-
 	public void setExercisePerformedID(int exercisePerformedID) {
 		this.exercisePerformedID = exercisePerformedID;
 	}
-
 
 	public Workout getWorkout() {
 		return workout;
 	}
 
-
 	public void setWorkout(Workout workout) {
 		this.workout = workout;
 	}
-
 
 	public Exercise getExercise() {
 		return exercise;
 	}
 
-
 	public void setExercise(Exercise exercise) {
 		this.exercise = exercise;
 	}
-
 
 	public int getNumberOfSets() {
 		return numberOfSets;
 	}
 
-
 	public void setNumberOfSets(int numberOfSets) {
 		this.numberOfSets = numberOfSets;
 	}
 
-
 	public int getNumberOfKilos() {
 		return numberOfKilos;
 	}
-
 
 	public void setNumberOfKilos(int numberOfKilos) {
 		this.numberOfKilos = numberOfKilos;

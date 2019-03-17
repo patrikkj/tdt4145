@@ -34,4 +34,9 @@ public class Note {
 	public void setText(String text) {
 		this.text = text;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Note [noteID=%s, text=%s]", noteID, text);
+	}
 }

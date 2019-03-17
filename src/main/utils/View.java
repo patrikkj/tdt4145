@@ -2,7 +2,7 @@ package main.utils;
 
 public enum View {
 	// 							TITLE			Type				FXML path
-	HOVEDSIDE(					"iExercise",	ViewType.SCENE,		"ui/Hovedside.fxml");
+	MAIN(						"iExercise",	ViewType.SCENE,		"ui/Main.fxml");
 //	POPUP_APPARAT(				null, 			true,				"ui/popups/ApparatPopup.fxml"), 
 //	POPUP_ØVELSE(				null,			true,				"ui/popups/ØvelsePopup.fxml"), 
 //	POPUP_TRENINGSØKT(			null, 			true,				"ui/popups/TreningsøktPopup.fxml"),

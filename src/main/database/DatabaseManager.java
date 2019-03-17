@@ -152,12 +152,14 @@ public class DatabaseManager {
 	private static ResultSet executeTimedQuery(String query) {
 		ResultSet resultSet = null;
 		
-		try (Statement statement = connection.createStatement()) {
+		
+		try {
+			Statement statement = connection.createStatement();
 			try {
-				resultSet = executeWithTimer(() -> statement.executeQuery(query), statement);
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), query);
 			} catch (RuntimeException e) {
 				openConnection();
-				resultSet = executeWithTimer(() -> statement.executeQuery(query), statement);
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), query);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -174,10 +176,10 @@ public class DatabaseManager {
 		ResultSet resultSet = null;
 		
 		try {
-			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
+			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement.toString());
 		} catch (RuntimeException e) {
 			openConnection();
-			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement);
+			resultSet = executeWithTimer(() -> preparedStatement.executeQuery(), preparedStatement.toString());
 		}
 		
 		return resultSet;
@@ -190,12 +192,13 @@ public class DatabaseManager {
 	private static int executeTimedUpdate(String update) {
 		int linesChanged = 0;
 
-		try (Statement statement = connection.createStatement()) {
+		try {
+			Statement statement = connection.createStatement();
 			try {
-				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), statement);
+				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), update);
 			} catch (RuntimeException e) {
 				openConnection();
-				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), statement);
+				linesChanged = executeWithTimer(() -> statement.executeUpdate(update), update);
 			}
 		} catch (SQLException e1) {
 			e1.printStackTrace();
@@ -212,31 +215,32 @@ public class DatabaseManager {
 		int linesChanged;
 		
 		try {
-			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement.toString());
 		} catch (RuntimeException e) {
 			openConnection();
-			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+			linesChanged = executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement.toString());
 		}
 		
 		return linesChanged;
 	}	
 	
 	/**
-	 * Executes update specified by {@code query} and prints execution time to console.
+	 * Executes insertion specified by {@code query} and prints execution time to console.
 	 * Reattempts once if first execution fails.
 	 */
 	private static int executeTimedInsertGetID(String insert) {
 		int id = -1;
 		
-		try (Statement statement = connection.createStatement()) {
+		try {
+			Statement statement = connection.createStatement();
 			try {
-				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), statement);
+				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), insert);
 				ResultSet generatedKeys = statement.getGeneratedKeys();
 				if (generatedKeys.next())
 					id = generatedKeys.getInt(1);
 			} catch (RuntimeException e) {
 				openConnection();
-				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), statement);
+				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), insert);
 				ResultSet generatedKeys = statement.getGeneratedKeys();
 				if (generatedKeys.next())
 					id = generatedKeys.getInt(1);
@@ -249,7 +253,7 @@ public class DatabaseManager {
 	}
 	
 	/**
-	 * Executes update specified by {@code preparedStatement} and prints execution time to console.
+	 * Executes insertion specified by {@code preparedStatement} and prints execution time to console.
 	 * Reattempts once if first execution fails.
 	 */
 	private static int executeTimedInsertGetID(PreparedStatement preparedStatement) {
@@ -257,13 +261,13 @@ public class DatabaseManager {
 		
 		try {
 			try {
-				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement.toString());
 				ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
 				if (generatedKeys.next())
 					id = generatedKeys.getInt(1);
 			} catch (RuntimeException e) {
 				openConnection();
-				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement.toString());
 				ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
 				if (generatedKeys.next())
 					id = generatedKeys.getInt(1);
@@ -278,7 +282,7 @@ public class DatabaseManager {
 	/**
 	 * Wraps {@code Callable} in a timer, used for estimating statement execution time.
 	 */
-	private static <T> T executeWithTimer(Callable<T> callable, Statement statement) {
+	private static <T> T executeWithTimer(Callable<T> callable, String statement) {
 		T result = null;
 		try {
 			long start = System.nanoTime();
@@ -291,7 +295,7 @@ public class DatabaseManager {
 		return result;
 	}
 	
-	/*
+	/**
 	 * Opens SQL connection.
 	 * Runs at launch, and if the connection times out etc. 
 	 */
@@ -304,7 +308,7 @@ public class DatabaseManager {
 		}
 	}
 	
-	/*
+	/**
 	 * Closes SQL connection.
 	 * Runs from shutdown hook. 
 	 */

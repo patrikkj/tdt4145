@@ -44,4 +44,9 @@ public class Equipment {
 	public void setDescription(String description) {
 		this.description = description;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Equipment [equipmentID=%s, name=%s, description=%s]", equipmentID, name, description);
+	}
 }

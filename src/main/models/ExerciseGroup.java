@@ -34,4 +34,9 @@ public class ExerciseGroup {
 	public void setName(String name) {
 		this.name = name;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("ExerciseGroup [exerciseGroupID=%s, name=%s]", exerciseGroupID, name);
+	}
 }

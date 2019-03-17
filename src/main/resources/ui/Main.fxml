@@ -1,0 +1,295 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXDatePicker?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import com.jfoenix.controls.JFXTimePicker?>
+<?import com.jfoenix.controls.JFXTreeTableView?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.TreeTableColumn?>
+<?import javafx.scene.control.TreeTableView?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="800.0" prefWidth="1024.0" stylesheets="@../stylesheet.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.core.ui.MainController">
+   <children>
+      <VBox>
+         <children>
+            <HBox layoutX="10.0" layoutY="10.0">
+               <children>
+                  <VBox maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Apparater" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="addEquipmentButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddEquipmentClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="editEquipmentButton" alignment="CENTER" buttonType="RAISED" onAction="#handleEditEquipmentClick" prefHeight="25.0" prefWidth="25.0" styleClass="edit-button-round" text="...">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </JFXButton>
+                                    <JFXButton fx:id="deleteEquipmentButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteEquipmentClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                        <JFXListView fx:id="equipmentListView" fixedCellSize="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Øvelser" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="addExerciseButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddExerciseClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="editExerciseButton" alignment="CENTER" buttonType="RAISED" onAction="#handleEditExerciseClick" prefHeight="25.0" prefWidth="25.0" styleClass="edit-button-round" text="...">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </JFXButton>
+                                    <JFXButton fx:id="deleteExerciseButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteExerciseClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                        <JFXListView fx:id="exerciseListView" fixedCellSize="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox layoutX="512.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Øvelsesgrupper" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="addExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="editExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleEditExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="edit-button-round" text="...">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </JFXButton>
+                                    <JFXButton fx:id="deleteExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                        <JFXListView fx:id="exerciseGroupListView" fixedCellSize="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox layoutX="680.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Treningsøkter" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="addWorkoutButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddWorkoutClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="editWorkoutButton" alignment="CENTER" buttonType="RAISED" onAction="#handleEditWorkoutClick" prefHeight="25.0" prefWidth="25.0" styleClass="edit-button-round" text="...">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </JFXButton>
+                                    <JFXButton fx:id="deleteWorkoutButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteWorkoutClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                        <JFXListView fx:id="workoutListView" fixedCellSize="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox layoutX="763.0" layoutY="10.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" spacing="5.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <StackPane>
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Notater" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox alignment="CENTER_RIGHT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXButton fx:id="addNoteButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddNoteClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="editNoteButton" alignment="CENTER" buttonType="RAISED" onAction="#handleEditNoteClick" prefHeight="25.0" prefWidth="25.0" styleClass="edit-button-round" text="...">
+                                       <font>
+                                          <Font name="System Bold" size="12.0" />
+                                       </font>
+                                    </JFXButton>
+                                    <JFXButton fx:id="deleteNoteButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteNoteClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </StackPane>
+                        <JFXListView fx:id="noteListView" fixedCellSize="35.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" VBox.vgrow="ALWAYS">
+                           <VBox.margin>
+                              <Insets />
+                           </VBox.margin>
+                        </JFXListView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
+            <HBox VBox.vgrow="ALWAYS">
+               <children>
+                  <VBox spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Treningslogg" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" text="Viser" />
+                                    <JFXTextField fx:id="workoutCountTextField" alignment="CENTER" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="40.0" />
+                                    <Label layoutX="145.0" layoutY="10.0" maxHeight="1.7976931348623157E308" text="siste treningsøkter." />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                        <JFXTreeTableView fx:id="workoutLogTreeTableView" fixedCellSize="35.0" VBox.vgrow="ALWAYS">
+                           <columns>
+                              <TreeTableColumn fx:id="workoutLogIDColumn" prefWidth="75.0" text="ID" />
+                              <TreeTableColumn fx:id="workoutLogTimeColumn" prefWidth="75.0" text="Tidspunkt" />
+                              <TreeTableColumn fx:id="workoutLogDurationColumn" prefWidth="75.0" text="Varighet" />
+                              <TreeTableColumn fx:id="workoutLogShapeColumn" prefWidth="75.0" text="Form" />
+                              <TreeTableColumn fx:id="workoutLogPerformanceColumn" prefWidth="75.0" text="Prestasjon" />
+                              <TreeTableColumn fx:id="workoutLogNoteColumn" prefWidth="75.0" text="Notat" />
+                           </columns>
+                           <columnResizePolicy>
+                              <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </JFXTreeTableView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+                  <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" HBox.hgrow="ALWAYS">
+                     <children>
+                        <VBox>
+                           <children>
+                              <Label alignment="CENTER" maxWidth="1.7976931348623157E308" text="Resultatlogg" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                              </Label>
+                              <GridPane alignment="CENTER" vgap="10.0">
+                                <columnConstraints>
+                                  <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="100.0" />
+                                    <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="120.0" />
+                                  <ColumnConstraints hgrow="NEVER" minWidth="10.0" prefWidth="120.0" />
+                                </columnConstraints>
+                                <rowConstraints>
+                                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                                  <RowConstraints minHeight="10.0" prefHeight="40.0" vgrow="SOMETIMES" />
+                                </rowConstraints>
+                                 <children>
+                                    <Label maxHeight="1.7976931348623157E308" text="Angi øvelse:" GridPane.halignment="CENTER" GridPane.rowIndex="2" />
+                                    <Label maxHeight="1.7976931348623157E308" text="Start intervall:" GridPane.halignment="CENTER" />
+                                    <Label maxHeight="1.7976931348623157E308" text="Slutt intervall:" GridPane.halignment="CENTER" GridPane.rowIndex="1" />
+                                    <JFXDatePicker fx:id="startDatePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="1" />
+                                    <JFXTimePicker fx:id="startTimePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="2" />
+                                    <JFXDatePicker fx:id="endDatePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                    <JFXTimePicker fx:id="endTimePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
+                                    <JFXComboBox fx:id="exerciseComboBox" maxWidth="1.7976931348623157E308" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                                       <GridPane.margin>
+                                          <Insets right="5.0" />
+                                       </GridPane.margin>
+                                    </JFXComboBox>
+                                 </children>
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </GridPane>
+                              <HBox spacing="10.0" />
+                           </children>
+                        </VBox>
+                        <JFXTreeTableView fx:id="resultLogTreeTableView" fixedCellSize="35.0" VBox.vgrow="ALWAYS">
+                           <columns>
+                              <TreeTableColumn fx:id="resultLogIDColumn" prefWidth="75.0" text="ID" />
+                              <TreeTableColumn fx:id="resultLogTimeColumn" prefWidth="75.0" text="Tidspunkt" />
+                              <TreeTableColumn fx:id="resultLogDurationColumn" prefWidth="75.0" text="Varighet" />
+                              <TreeTableColumn fx:id="resultLogShapeColumn" prefWidth="75.0" text="Form" />
+                              <TreeTableColumn fx:id="resultLogPerformanceColumn" prefWidth="75.0" text="Prestasjon" />
+                              <TreeTableColumn fx:id="resultLogNoteColumn" prefWidth="75.0" text="Notat" />
+                           </columns>
+                           <columnResizePolicy>
+                              <TreeTableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                           </columnResizePolicy>
+                        </JFXTreeTableView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                     </padding>
+                  </VBox>
+               </children>
+            </HBox>
+         </children>
+      </VBox>
+   </children>
+   <padding>
+      <Insets bottom="10.0" left="10.0" right="10.0" top="5.0" />
+   </padding>
+</StackPane>

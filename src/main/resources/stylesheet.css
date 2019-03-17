@@ -1,0 +1,76 @@
+.add-button-round {
+	-fx-background-color: #456045;
+	-fx-background-radius: 20px;
+	-fx-text-fill: #DDDDDD;
+}
+
+.edit-button-round {
+	-fx-background-color: #907010;
+	-fx-background-radius: 20px;
+	-fx-text-fill: #DDDDDD;
+}
+
+.delete-button-round {
+	-fx-background-color: #903030;
+	-fx-background-radius: 20px;
+	-fx-text-fill: #DDDDDD;
+}
+
+.region-separator {
+	-fx-background-color: #DDDDDD;
+	-fx-background-radius: 20px;
+	
+}
+
+.primary-button-light {
+	-fx-background-color: #454545;
+	-fx-text-fill: #DDDDDD;
+}
+.primary-button-light .jfx-rippler {
+	-jfx-rippler-fill: #979797;
+}
+
+.jfx-tree-table-view .tree-table-cell {
+	-fx-alignment: center;
+}
+
+.list-view-spinner {
+	-jfx-radius: 30;
+	-fx-opacity: 0.5;
+}
+
+.jfx-list-view {
+  	-fx-background-insets: 0, 0, 1, 2;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+.jfx-list-view .list-cell:selected .jfx-rippler{
+	-jfx-rippler-fill: #EEEEEE;
+}
+.jfx-list-view .list-cell:hover {
+	-fx-background-color: derive(#BBBBBB, 60%);
+}
+.jfx-list-view .list-cell:selected {
+	-fx-background-color: derive(#BBBBBB, 20%);
+	-fx-text-fill: #000000;
+}
+.jfx-list-view .list-cell:selected:hover {
+	-fx-background-color: derive(#BBBBBB, 0%);
+}
+.jfx-list-view .list-cell .jfx-rippler{
+	-jfx-rippler-fill: #202020;
+}
+
+
+.jfx-tree-table-view .tree-table-row-cell:filled:even {
+	-fx-background-color: #F9F9F9;
+}
+.jfx-tree-table-view .tree-table-row-cell:filled:hover {
+	-fx-background-color: derive(#BBBBBB, 60%);
+}
+.jfx-tree-table-view .tree-table-row-cell:filled:selected {
+	-fx-background-color: derive(#BBBBBB, 20%);
+}
+.jfx-tree-table-view .tree-table-row-cell:filled:selected:hover {
+	-fx-background-color: derive(#BBBBBB, 0%);
+}

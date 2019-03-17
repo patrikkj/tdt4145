@@ -54,4 +54,10 @@ public class Exercise {
 	public void setEquipment(Equipment equipment) {
 		this.equipment = equipment;
 	}
+
+	@Override
+	public String toString() {
+		return String.format("Exercise [exerciseID=%s, name=%s, description=%s, equipment=%s]", exerciseID, name,
+				description, equipment);
+	}
 }

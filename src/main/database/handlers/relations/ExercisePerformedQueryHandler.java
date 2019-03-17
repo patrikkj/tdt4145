@@ -1,0 +1,107 @@
+package main.database.handlers.relations;
+
+import java.util.List;
+import java.util.stream.Collectors;
+
+import main.database.DatabaseManager;
+import main.database.Record;
+import main.database.handlers.ExerciseQueryHandler;
+import main.database.handlers.WorkoutQueryHandler;
+import main.models.Exercise;
+import main.models.Workout;
+import main.models.relations.ExercisePerformed;
+
+public class ExercisePerformedQueryHandler {
+
+	/**
+	 * Returns a list containing every {@code ExercisePerformed} entity in the database.
+	 */
+	public static List<ExercisePerformed> getExercisePerformedRelations() {
+		String query = "SELECT * FROM exercise_performed AS a "
+				+ "INNER JOIN workout AS b ON a.workout_id = b.workout_id "
+				+ "INNER JOIN exercise AS c ON a.exercise_id = c.exercise_id";
+		List<Record> records = DatabaseManager.executeQuery(query);
+		return records.stream()
+				.map(ExercisePerformedQueryHandler::extractExercisePerformedFromRecord)
+				.collect(Collectors.toList());
+	}
+
+	/**
+	 * Returns the {@code ExercisePerformed} identified by the given {@code exercisePerformedID}.
+	 */
+	public static ExercisePerformed getExercisePerformedByID(int exercisePerformedID) {
+		String query = "SELECT * FROM exercise_performed AS a "
+				+ "INNER JOIN workout AS b ON a.workout_id = b.workout_id "
+				+ "INNER JOIN exercise AS c ON a.exercise_id = c.exercise_id "
+				+ "WHERE exercise_performed_id = ?";
+		List<Record> records = DatabaseManager.executeQuery(query, exercisePerformedID);
+		return extractExercisePerformedFromRecord(records.get(0));
+	}
+	
+	/**
+	 * Updates the database record for the exercisePerformed specified.
+	 * @return the number of lines changed.
+	 */
+	public static int updateExercisePerformed(ExercisePerformed exercisePerformed) {
+		String update = "UPDATE exercise_performed SET workout_id = ?, exercise_id = ?, number_of_sets = ?, number_of_kilos = ? WHERE exercise_performed_id = ?"; 
+		return DatabaseManager.executeUpdate(update, 
+				exercisePerformed.getWorkout().getWorkoutID(),		// NOT NULL
+				exercisePerformed.getExercise().getExerciseID(),	// NOT NULL
+				exercisePerformed.getNumberOfSets(),
+				exercisePerformed.getNumberOfKilos(),
+				exercisePerformed.getExercisePerformedID());
+	}
+	
+	/**
+	 * Inserts a new database record corresponding to the given {@code exercisePerformed}.
+	 * @return the auto-generated identifier.
+	 */
+	public static int insertExercisePerformedAssignID(ExercisePerformed exercisePerformed) {
+		String insert = "INSERT INTO exercise_performed (workout_id, exercise_id, number_of_sets, number_of_kilos) VALUES (?, ?, ?, ?)";
+		int exercisePerformedID = DatabaseManager.executeInsertGetID(insert,
+				exercisePerformed.getWorkout().getWorkoutID(),		// NOT NULL
+				exercisePerformed.getExercise().getExerciseID(),	// NOT NULL
+				exercisePerformed.getNumberOfSets(),
+				exercisePerformed.getNumberOfKilos());
+		exercisePerformed.setExercisePerformedID(exercisePerformedID);
+		return exercisePerformedID;
+	}
+	
+	/**
+	 * Deletes the database record for the exercisePerformed specified.
+	 * @return the number of lines changed.
+	 */
+	public static int deleteExercisePerformed(ExercisePerformed exercisePerformed) {
+		String delete = "DELETE FROM exercise_performed WHERE exercise_performed_id = ?";
+		return DatabaseManager.executeUpdate(delete, exercisePerformed.getExercisePerformedID());
+	}
+	
+	/**
+	 * Deletes the database record for every entity in the list.
+	 * @return the number of lines changed.
+	 */
+	public static int deleteExercisePerformeds(List<ExercisePerformed> exercisePerformeds) {
+		String parsedIDs = exercisePerformeds.stream()
+				.map(e -> String.format("'%s'", e.getExercisePerformedID()))
+				.collect(Collectors.joining(", ", "(", ")"));
+		String delete = String.format("DELETE FROM exercise_performed WHERE exercise_performed_id IN %s", parsedIDs);
+		return DatabaseManager.executeUpdate(delete);
+	}
+	
+	/**
+	 * Creates a new {@code ExercisePerformed} instance from the record specified.
+	 */
+	public static ExercisePerformed extractExercisePerformedFromRecord(Record record) {
+		// Assert that record contains a valid instance of this class
+		Integer exercisePerformedID = record.get(Integer.class, "exercise_performed.exercise_performed_id");
+		if (exercisePerformedID == null)
+			return null;
+
+		Workout workout = WorkoutQueryHandler.extractWorkoutFromRecord(record);
+		Exercise exercise = ExerciseQueryHandler.extractExerciseFromRecord(record);
+	    int numberOfSets = record.get(Integer.class, "exercise_performed.number_of_sets");
+	    int numberOfKilos = record.get(Integer.class, "exercise_performed.number_of_kilos");
+		
+	    return new ExercisePerformed(exercisePerformedID, workout, exercise, numberOfSets, numberOfKilos);
+	}
+}
