@@ -66,7 +66,7 @@ public class DatabaseManager {
 	 * Sends query and reestablishes connection if lost.
 	 */
 	public static List<Record> executeQuery(String preparedStatement, Object... args) {
-		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, args));
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, false, args));
 		return Record.generateRecords(resultSet);
 	}
 	
@@ -75,7 +75,7 @@ public class DatabaseManager {
 	 */
 	@SafeVarargs
 	public static <T> List<Record> executeQuery(String preparedStatement, Pair<Class<T>, T>... pairs) {
-		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, pairs));
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, false, pairs));
 		return Record.generateRecords(resultSet);
 	}
 
@@ -99,7 +99,7 @@ public class DatabaseManager {
 	 * Sends query and reestablishes connection if lost.
 	 */
 	public static int executeUpdate(String preparedStatement, Object... args) {
-		return executeTimedUpdate(prepareStatement(preparedStatement, args));
+		return executeTimedUpdate(prepareStatement(preparedStatement, false, args));
 	}
 	
 	/*
@@ -107,9 +107,42 @@ public class DatabaseManager {
 	 */
 	@SafeVarargs
 	public static <T> int executeUpdate(String preparedStatement, Pair<Class<T>, T>... pairs) {
-		return executeTimedUpdate(prepareStatement(preparedStatement, pairs));
+		return executeTimedUpdate(prepareStatement(preparedStatement, false, pairs));
 	}
 
+	
+	// Insertion
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeInsertGetID(String insert) {
+		return executeTimedInsertGetID(insert);
+	}
+	
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeInsertGetID(PreparedStatement preparedStatement) {
+		// TODO: MUST BE KEYGEN-STATEMENT!!
+
+		return executeTimedInsertGetID(preparedStatement);
+	}
+	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	public static int executeInsertGetID(String preparedStatement, Object... args) {
+		return executeTimedInsertGetID(prepareStatement(preparedStatement, true, args));
+	}
+	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	@SafeVarargs
+	public static <T> int executeInsertGetID(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		return executeTimedInsertGetID(prepareStatement(preparedStatement, true, pairs));
+	}
+	
 	
 	// Private
 	/**
@@ -189,6 +222,60 @@ public class DatabaseManager {
 	}	
 	
 	/**
+	 * Executes update specified by {@code query} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static int executeTimedInsertGetID(String insert) {
+		int id = -1;
+		
+		try (Statement statement = connection.createStatement()) {
+			try {
+				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), statement);
+				ResultSet generatedKeys = statement.getGeneratedKeys();
+				if (generatedKeys.next())
+					id = generatedKeys.getInt(1);
+			} catch (RuntimeException e) {
+				openConnection();
+				executeWithTimer(() -> statement.executeUpdate(insert, Statement.RETURN_GENERATED_KEYS), statement);
+				ResultSet generatedKeys = statement.getGeneratedKeys();
+				if (generatedKeys.next())
+					id = generatedKeys.getInt(1);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+		return id;
+	}
+	
+	/**
+	 * Executes update specified by {@code preparedStatement} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static int executeTimedInsertGetID(PreparedStatement preparedStatement) {
+		int id = -1;
+		
+		try {
+			try {
+				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+				ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+				if (generatedKeys.next())
+					id = generatedKeys.getInt(1);
+			} catch (RuntimeException e) {
+				openConnection();
+				executeWithTimer(() -> preparedStatement.executeUpdate(), preparedStatement);
+				ResultSet generatedKeys = preparedStatement.getGeneratedKeys();
+				if (generatedKeys.next())
+					id = generatedKeys.getInt(1);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+		return id;
+	}	
+	
+	/**
 	 * Wraps {@code Callable} in a timer, used for estimating statement execution time.
 	 */
 	private static <T> T executeWithTimer(Callable<T> callable, Statement statement) {
@@ -233,10 +320,10 @@ public class DatabaseManager {
 	 * Creates a {@link PreparedStatement} and initializes with the specified {@code args} as wildcard parameters.
 	 * Uses {@link DatabaseUtil#setStatementArgument} to determine SQL parameter types.
 	 */
-	private static PreparedStatement prepareStatement(String statement, Object... args) {
+	private static PreparedStatement prepareStatement(String statement, boolean getID, Object... args) {
 		PreparedStatement preparedStatement = null;
 		try {
-			preparedStatement = connection.prepareStatement(statement);
+			preparedStatement = connection.prepareStatement(statement, getID ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
 			for (int argNum = 1; argNum <= args.length; argNum++)
 				DatabaseUtil.setStatementArgument(preparedStatement, args[argNum - 1], null, argNum);
 		} catch (SQLException e) {
@@ -250,10 +337,10 @@ public class DatabaseManager {
 	 * Uses {@link DatabaseUtil#setStatementArgument} to determine SQL parameter types.
 	 */
 	@SafeVarargs
-	private static <T> PreparedStatement prepareStatement(String statement, Pair<Class<T>, T>... pairs) {
+	private static <T> PreparedStatement prepareStatement(String statement, boolean getID, Pair<Class<T>, T>... pairs) {
 		PreparedStatement preparedStatement = null;
 		try {
-			preparedStatement = connection.prepareStatement(statement);
+			preparedStatement = connection.prepareStatement(statement, getID ? Statement.RETURN_GENERATED_KEYS : Statement.NO_GENERATED_KEYS);
 			for (int argNum = 1; argNum <= pairs.length; argNum++)
 				DatabaseUtil.setStatementArgument(preparedStatement, pairs[argNum - 1].getValue(), pairs[argNum - 1].getKey(), argNum);
 		} catch (SQLException e) {
