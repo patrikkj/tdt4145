@@ -2,8 +2,10 @@ package main.utils;
 
 public enum View {
 	// 							TITLE			Type				FXML path
-	MAIN(						"iExercise",	ViewType.SCENE,		"ui/Main.fxml");
-//	POPUP_APPARAT(				null, 			true,				"ui/popups/ApparatPopup.fxml"), 
+	MAIN(						"iExercise",	ViewType.SCENE,		"ui/Main.fxml"),
+	POPUP_EQUIPMENT(			null, 			ViewType.POPUP,		"ui/popups/EquipmentPopup.fxml"),
+	POPUP_EXERCISE_GROUP(		null, 			ViewType.POPUP,		"ui/popups/ExerciseGroupPopup.fxml"),
+	POPUP_NOTE(					null, 			ViewType.POPUP,		"ui/popups/NotePopup.fxml");
 //	POPUP_ØVELSE(				null,			true,				"ui/popups/ØvelsePopup.fxml"), 
 //	POPUP_TRENINGSØKT(			null, 			true,				"ui/popups/TreningsøktPopup.fxml"),
 //	POPUP_ØVELSE_GRUPPE(		null, 			true,				"ui/popups/ØvelseGruppePopup.fxml"),

@@ -72,6 +72,7 @@ public class StageManager {
 	 * Closes the previous stage and creates a new one.
 	 */
 	public static JFXDialog createPopupDialog(StackPane container, View view) {
+		// Assert that the view specified is a valid popup
 		if (!(Loader.getController(view) instanceof AbstractPopupController))
 			throw new IllegalArgumentException(String.format("Failed to create popup from '%s', view has to be a subclass of '%s'.", 
 					view, AbstractPopupController.class.getSimpleName()));

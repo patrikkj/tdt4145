@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 import main.database.DatabaseManager;
 import main.database.Record;
-import main.database.handlers.ExerciseGroupQueryHandler;
-import main.database.handlers.ExerciseQueryHandler;
+import main.database.handlers.ExerciseGroupService;
+import main.database.handlers.ExerciseService;
 import main.models.Exercise;
 import main.models.ExerciseGroup;
 import main.models.relations.ExerciseIncludedIn;
 
-public class ExerciseIncludedInQueryHandler {
+public class ExerciseIncludedInService {
 	
 	/**
 	 * Returns a list containing every {@code ExerciseIncludedIn} entity in the database.
@@ -22,7 +22,7 @@ public class ExerciseIncludedInQueryHandler {
 				+ "INNER JOIN exercise_group AS c ON a.exercise_group_id = c.exercise_group_id";
 		List<Record> records = DatabaseManager.executeQuery(query);
 		return records.stream()
-				.map(ExerciseIncludedInQueryHandler::extractExerciseIncludedInFromRecord)
+				.map(ExerciseIncludedInService::extractExerciseIncludedInFromRecord)
 				.collect(Collectors.toList());
 	}
 	
@@ -93,8 +93,8 @@ public class ExerciseIncludedInQueryHandler {
 		if (exerciseIncludedInID == null)
 			return null;
 
-		Exercise exercise = ExerciseQueryHandler.extractExerciseFromRecord(record);
-		ExerciseGroup exerciseGroup = ExerciseGroupQueryHandler.extractExerciseGroupFromRecord(record);
+		Exercise exercise = ExerciseService.extractExerciseFromRecord(record);
+		ExerciseGroup exerciseGroup = ExerciseGroupService.extractExerciseGroupFromRecord(record);
 		
 		return new ExerciseIncludedIn(exerciseIncludedInID, exercise, exerciseGroup);
 	}

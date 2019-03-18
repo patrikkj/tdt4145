@@ -7,7 +7,7 @@ import main.database.DatabaseManager;
 import main.database.Record;
 import main.models.Equipment;
 
-public class EquipmentQueryHandler {
+public class EquipmentService {
 	
 	/**
 	 * Returns a list containing every {@code Equipment} entity in the database.
@@ -15,7 +15,7 @@ public class EquipmentQueryHandler {
 	public static List<Equipment> getEquipments() {
 		List<Record> records = DatabaseManager.executeQuery("SELECT * FROM equipment");
 		return records.stream()
-				.map(EquipmentQueryHandler::extractEquipmentFromRecord)
+				.map(EquipmentService::extractEquipmentFromRecord)
 				.collect(Collectors.toList());
 	}
 	

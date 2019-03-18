@@ -1,9 +1,8 @@
 package main.database.handlers;
 
-import java.sql.Date;
 import java.sql.Time;
-import java.time.LocalDate;
-import java.time.LocalTime;
+import java.sql.Timestamp;
+import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -12,7 +11,7 @@ import main.database.Record;
 import main.models.Note;
 import main.models.Workout;
 
-public class WorkoutQueryHandler {
+public class WorkoutService {
 	
 	/**
 	 * Returns a list containing every {@code Workout} entity in the database.
@@ -22,7 +21,7 @@ public class WorkoutQueryHandler {
 				+ "LEFT JOIN note AS b ON a.note_id = b.note_id";
 		List<Record> records = DatabaseManager.executeQuery(query);
 		return records.stream()
-				.map(WorkoutQueryHandler::extractWorkoutFromRecord)
+				.map(WorkoutService::extractWorkoutFromRecord)
 				.collect(Collectors.toList());
 	}
 
@@ -40,10 +39,9 @@ public class WorkoutQueryHandler {
 	 * @return the number of lines changed.
 	 */
 	public static int updateWorkout(Workout workout) {
-		String update = "UPDATE workout SET date = ?, time = ?, duration = ?, shape = ?, performance = ?, note_id = ? WHERE workout_id = ?"; 
+		String update = "UPDATE workout SET timestamp = ?, duration = ?, shape = ?, performance = ?, note_id = ? WHERE workout_id = ?"; 
 		return DatabaseManager.executeUpdate(update, 
-				workout.getDate(),
-				workout.getTime(),
+				workout.getTimestamp(),
 				workout.getDuration(),
 				workout.getShape(),
 				workout.getPerformance(),
@@ -56,10 +54,9 @@ public class WorkoutQueryHandler {
 	 * @return the auto-generated identifier.
 	 */
 	public static int insertWorkoutAssignID(Workout workout) {
-		String insert = "INSERT INTO workout (date, time, duration, shape, performance, note_id) VALUES (?, ?, ?, ?, ?, ?)";
+		String insert = "INSERT INTO workout (timestamp, duration, shape, performance, note_id) VALUES (?, ?, ?, ?, ?, ?)";
 		int workoutID = DatabaseManager.executeInsertGetID(insert,
-				workout.getDate(),
-				workout.getTime(),
+				workout.getTimestamp(),
 				workout.getDuration(),
 				workout.getShape(),
 				workout.getPerformance(),
@@ -98,17 +95,16 @@ public class WorkoutQueryHandler {
 		if (workoutID == null)
 			return null;
 		
-	    Date date = record.get(Date.class, "workout.date");
-	    Time time = record.get(Time.class, "workout.time");
+	    Timestamp timestamp = record.get(Timestamp.class, "workout.timestamp");
 	    Time duration = record.get(Time.class, "workout.duration");
 	    int shape = record.get(Integer.class, "workout.shape");
 	    int performance = record.get(Integer.class, "workout.performance");
-	    Note note = NoteQueryHandler.extractNoteFromRecord(record);
+	    Note note = NoteService.extractNoteFromRecord(record);
 	    
-		return new Workout(workoutID, date, time, duration, shape, performance, note);
+		return new Workout(workoutID, timestamp, duration, shape, performance, note);
 	}
 	
 	public static void main(String[] args) {
-		insertWorkoutAssignID(new Workout(Date.valueOf(LocalDate.now()), Time.valueOf(LocalTime.now()), Time.valueOf("02:32:15"), 8, 9, null));
+		insertWorkoutAssignID(new Workout(Timestamp.from(Instant.now()), Time.valueOf("02:32:15"), 8, 9, null));
 	}
 }

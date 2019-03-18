@@ -7,7 +7,7 @@ import main.database.DatabaseManager;
 import main.database.Record;
 import main.models.ExerciseGroup;
 
-public class ExerciseGroupQueryHandler {
+public class ExerciseGroupService {
 	
 	/**
 	 * Returns a list containing every {@code ExerciseGroup} entity in the database.
@@ -15,7 +15,7 @@ public class ExerciseGroupQueryHandler {
 	public static List<ExerciseGroup> getExerciseGroups() {
 		List<Record> records = DatabaseManager.executeQuery("SELECT * FROM exercise_group");
 		return records.stream()
-				.map(ExerciseGroupQueryHandler::extractExerciseGroupFromRecord)
+				.map(ExerciseGroupService::extractExerciseGroupFromRecord)
 				.collect(Collectors.toList());
 	}
 	

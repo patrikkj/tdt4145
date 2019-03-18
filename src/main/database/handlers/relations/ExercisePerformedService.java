@@ -5,13 +5,13 @@ import java.util.stream.Collectors;
 
 import main.database.DatabaseManager;
 import main.database.Record;
-import main.database.handlers.ExerciseQueryHandler;
-import main.database.handlers.WorkoutQueryHandler;
+import main.database.handlers.ExerciseService;
+import main.database.handlers.WorkoutService;
 import main.models.Exercise;
 import main.models.Workout;
 import main.models.relations.ExercisePerformed;
 
-public class ExercisePerformedQueryHandler {
+public class ExercisePerformedService {
 
 	/**
 	 * Returns a list containing every {@code ExercisePerformed} entity in the database.
@@ -22,7 +22,7 @@ public class ExercisePerformedQueryHandler {
 				+ "INNER JOIN exercise AS c ON a.exercise_id = c.exercise_id";
 		List<Record> records = DatabaseManager.executeQuery(query);
 		return records.stream()
-				.map(ExercisePerformedQueryHandler::extractExercisePerformedFromRecord)
+				.map(ExercisePerformedService::extractExercisePerformedFromRecord)
 				.collect(Collectors.toList());
 	}
 
@@ -97,8 +97,8 @@ public class ExercisePerformedQueryHandler {
 		if (exercisePerformedID == null)
 			return null;
 
-		Workout workout = WorkoutQueryHandler.extractWorkoutFromRecord(record);
-		Exercise exercise = ExerciseQueryHandler.extractExerciseFromRecord(record);
+		Workout workout = WorkoutService.extractWorkoutFromRecord(record);
+		Exercise exercise = ExerciseService.extractExerciseFromRecord(record);
 	    int numberOfSets = record.get(Integer.class, "exercise_performed.number_of_sets");
 	    int numberOfKilos = record.get(Integer.class, "exercise_performed.number_of_kilos");
 		

@@ -7,7 +7,7 @@ import main.database.DatabaseManager;
 import main.database.Record;
 import main.models.Note;
 
-public class NoteQueryHandler {
+public class NoteService {
 	
 	/**
 	 * Returns a list containing every {@code Note} entity in the database.
@@ -15,7 +15,7 @@ public class NoteQueryHandler {
 	public static List<Note> getNotes() {
 		List<Record> records = DatabaseManager.executeQuery("SELECT * FROM note");
 		return records.stream()
-				.map(NoteQueryHandler::extractNoteFromRecord)
+				.map(NoteService::extractNoteFromRecord)
 				.collect(Collectors.toList());
 	}
 
@@ -33,8 +33,9 @@ public class NoteQueryHandler {
 	 * @return the number of lines changed.
 	 */
 	public static int updateNote(Note note) {
-		String update = "UPDATE note SET text = ? WHERE note_id = ?"; 
+		String update = "UPDATE note SET title = ?, text = ? WHERE note_id = ?"; 
 		return DatabaseManager.executeUpdate(update, 
+				note.getTitle(),
 				note.getText(),
 				note.getNoteID());
 	}
@@ -44,8 +45,9 @@ public class NoteQueryHandler {
 	 * @return the auto-generated identifier.
 	 */
 	public static int insertNoteAssignID(Note note) {
-		String insert = "INSERT INTO note (text) VALUES (?)";
+		String insert = "INSERT INTO note (title, text) VALUES (?, ?)";
 		int noteID = DatabaseManager.executeInsertGetID(insert,
+				note.getTitle(),
 				note.getText());
 		note.setNoteID(noteID);
 		return noteID;
@@ -81,8 +83,9 @@ public class NoteQueryHandler {
 		if (noteID == null)
 			return null;
 		
+		String title = record.get(String.class, "note.title");
 	    String text = record.get(String.class, "note.text");
 	    
-		return new Note(noteID, text);
+		return new Note(noteID, title, text);
 	}
 }

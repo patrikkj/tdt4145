@@ -8,7 +8,7 @@ import main.database.Record;
 import main.models.Equipment;
 import main.models.Exercise;
 
-public class ExerciseQueryHandler {
+public class ExerciseService {
 	// TODO: Might have to use Pair<Class, Object> implementation for null handling
 	/**
 	 * Returns a list containing every {@code Exercise} entity in the database.
@@ -18,7 +18,7 @@ public class ExerciseQueryHandler {
 				+ "LEFT JOIN equipment AS b ON a.equipment_id = b.equipment_id";
 		List<Record> records = DatabaseManager.executeQuery(query);
 		return records.stream()
-				.map(ExerciseQueryHandler::extractExerciseFromRecord)
+				.map(ExerciseService::extractExerciseFromRecord)
 				.collect(Collectors.toList());
 	}
 
@@ -90,7 +90,7 @@ public class ExerciseQueryHandler {
 	    
 	    String name = record.get(String.class, "exercise.name");
 	    String description = record.get(String.class, "exercise.description");
-	    Equipment equipment = EquipmentQueryHandler.extractEquipmentFromRecord(record);
+	    Equipment equipment = EquipmentService.extractEquipmentFromRecord(record);
 	    
 		return new Exercise(exerciseID, name, description, equipment);
 	}

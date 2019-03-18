@@ -2,11 +2,12 @@ package main.models;
 
 import java.sql.Date;
 import java.sql.Time;
+import java.sql.Timestamp;
 
 public class Workout {
 	private int workoutID;
 	private Date date;
-	private Time time;
+	private Timestamp timestamp;
 	private Time duration;
 	private int shape;
 	private int performance;
@@ -17,14 +18,13 @@ public class Workout {
 		this.workoutID = -1;
 	}
 
-	public Workout(Date date, Time time, Time duration, int shape, int performance, Note note) {
-		this(-1, date, time, duration, shape, performance, note);
+	public Workout(Timestamp timestamp, Time duration, int shape, int performance, Note note) {
+		this(-1, timestamp, duration, shape, performance, note);
 	}
 	
-	public Workout(int øktID, Date date, Time time, Time duration, int shape, int performance, Note note) {
+	public Workout(int øktID, Timestamp timestamp, Time duration, int shape, int performance, Note note) {
 		this.workoutID = øktID;
-		this.date = date;
-		this.time = time;
+		this.timestamp = timestamp;
 		this.duration = duration;
 		this.shape = shape;
 		this.performance = performance;
@@ -40,20 +40,12 @@ public class Workout {
 		this.workoutID = workoutID;
 	}
 
-	public Date getDate() {
-		return date;
+	public Timestamp getTimestamp() {
+		return timestamp;
 	}
 
-	public void setDate(Date date) {
-		this.date = date;
-	}
-
-	public Time getTime() {
-		return time;
-	}
-
-	public void setTime(Time time) {
-		this.time = time;
+	public void setTimestamp(Timestamp timestamp) {
+		this.timestamp = timestamp;
 	}
 
 	public Time getDuration() {
@@ -90,7 +82,7 @@ public class Workout {
 
 	@Override
 	public String toString() {
-		return String.format("Workout [workoutID=%s, date=%s, time=%s, duration=%s, shape=%s, performance=%s, note=%s]",
-				workoutID, date, time, duration, shape, performance, note);
+		return String.format("Workout [workoutID=%s, date=%s, timestamp=%s, duration=%s, shape=%s, performance=%s, note=%s]",
+				workoutID, date, timestamp, duration, shape, performance, note);
 	}
 }

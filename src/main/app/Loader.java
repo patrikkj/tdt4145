@@ -12,7 +12,9 @@ import java.util.stream.Collectors;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.image.Image;
+import main.core.ui.popups.AbstractPopupController;
 import main.utils.PostInitialize;
+import main.utils.Refreshable;
 import main.utils.View;
 import main.utils.View.ViewType;
 
@@ -67,15 +69,27 @@ public class Loader implements Runnable {
 		checkView(view, loader);
 	}
 	
+	/**
+	 * Validates controller properties for the given {@code View}.
+	 */
 	private void checkView(View view, FXMLLoader loader) {
-		switch (view) {
-		case MAIN:
-			break;
-		default:
-			break;
-		}
-	}
+		ViewType type = view.getViewType();
+		Object controller = loader.getController();
 
+		// Check if all views have controllers
+		if (controller == null)
+			throw new RuntimeException(String.format("Controller is null for view '%s'.", view));
+		
+		// Check if popup is instance of AbstractPopupController
+		if (type == ViewType.POPUP  &&  !(controller instanceof AbstractPopupController))
+			throw new RuntimeException(String.format("Popup controller for view '%s' must be a subclass of '%s'.", 
+					view, AbstractPopupController.class.getSimpleName()));
+		
+		// Check if all views implement Refreshable
+		if (!(controller instanceof Refreshable))
+			throw new RuntimeException(String.format("Controller for view '%s' must be a subclass of '%s'.", 
+					view, Refreshable.class.getSimpleName()));
+	}
 
 	/**
 	 * Loads the FXML file represented by the given {@code View}.

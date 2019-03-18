@@ -1,14 +1,15 @@
 package main.core.ui;
 
-import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
-import java.time.LocalDateTime;
 import java.util.List;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
 import com.jfoenix.controls.JFXDatePicker;
+import com.jfoenix.controls.JFXDialog;
+import com.jfoenix.controls.JFXListCell;
 import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTimePicker;
@@ -16,27 +17,43 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
+import javafx.scene.control.ListCell;
+import javafx.scene.control.ListView;
 import javafx.scene.control.SelectionMode;
 import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
-import main.database.handlers.EquipmentQueryHandler;
-import main.database.handlers.ExerciseGroupQueryHandler;
-import main.database.handlers.ExerciseQueryHandler;
-import main.database.handlers.NoteQueryHandler;
-import main.database.handlers.WorkoutQueryHandler;
+import javafx.scene.layout.StackPane;
+import javafx.util.Callback;
+import main.app.Loader;
+import main.app.StageManager;
+import main.core.ui.popups.EquipmentPopupController;
+import main.core.ui.popups.ExerciseGroupPopupController;
+import main.core.ui.popups.NotePopupController;
+import main.database.handlers.EquipmentService;
+import main.database.handlers.ExerciseGroupService;
+import main.database.handlers.ExerciseService;
+import main.database.handlers.NoteService;
+import main.database.handlers.WorkoutService;
 import main.models.Equipment;
 import main.models.Exercise;
 import main.models.ExerciseGroup;
 import main.models.Note;
 import main.models.Workout;
+import main.utils.PostInitialize;
+import main.utils.Refreshable;
+import main.utils.View;
 
-public class MainController {
+public class MainController implements Refreshable {
+	@FXML private StackPane rootPane;
+	
 	// Equipment
 	@FXML private JFXButton addEquipmentButton;
     @FXML private JFXButton editEquipmentButton;
@@ -93,17 +110,120 @@ public class MainController {
     @FXML private TreeTableColumn<WorkoutTreeData, String> resultLogPerformanceColumn;
     @FXML private TreeTableColumn<WorkoutTreeData, String> resultLogNoteColumn;
 
+    // Controller references
+    private EquipmentPopupController equipmentController;
+    private ExerciseGroupPopupController exerciseGroupController;
+    private NotePopupController noteController;
+    
+    // Selection properties
+    private IntegerBinding equipmentSelectionSize;
+    private IntegerBinding exerciseSelectionSize;
+    private IntegerBinding exerciseGroupSelectionSize;
+    private IntegerBinding workoutSelectionSize;
+    private IntegerBinding noteSelectionSize;
+    
+    
     
     @FXML
     private void initialize() {
     	initializeListViews();
     	initializeWorkoutLogTable();
     	initializeResultLogTable();
+    	initializeBindings();
+    	initializeChangeListeners();
     	update();
     }
     
-    private void initializeListViews() {
+    /**
+	 * Initialize property bindings, making sure that the interface
+	 * is in a valid state by disallowing invalid actions.
+	 */
+	private void initializeBindings() {
+    	equipmentSelectionSize = Bindings.size(equipmentListView.getSelectionModel().getSelectedItems());
+    	exerciseSelectionSize = Bindings.size(exerciseListView.getSelectionModel().getSelectedItems());
+    	exerciseGroupSelectionSize = Bindings.size(exerciseGroupListView.getSelectionModel().getSelectedItems());
+    	workoutSelectionSize = Bindings.size(workoutListView.getSelectionModel().getSelectedItems());
+    	noteSelectionSize = Bindings.size(noteListView.getSelectionModel().getSelectedItems());
     	
+    	// Bind 'add' button to being disabled when no single course is selected.
+    	editEquipmentButton.disableProperty().bind(equipmentSelectionSize.isNotEqualTo(1));
+    	editExerciseButton.disableProperty().bind(exerciseSelectionSize.isNotEqualTo(1));
+    	editExerciseGroupButton.disableProperty().bind(exerciseGroupSelectionSize.isNotEqualTo(1));
+    	editWorkoutButton.disableProperty().bind(workoutSelectionSize.isNotEqualTo(1));
+    	editNoteButton.disableProperty().bind(noteSelectionSize.isNotEqualTo(1));
+
+    	// Bind 'delete' button to being disabled when no entity is selected.
+    	deleteEquipmentButton.disableProperty().bind(equipmentSelectionSize.isEqualTo(0));
+    	deleteExerciseButton.disableProperty().bind(exerciseSelectionSize.isEqualTo(0));
+    	deleteExerciseGroupButton.disableProperty().bind(exerciseGroupSelectionSize.isEqualTo(0));
+    	deleteWorkoutButton.disableProperty().bind(workoutSelectionSize.isEqualTo(0));
+    	deleteNoteButton.disableProperty().bind(noteSelectionSize.isEqualTo(0));
+	}
+    
+	/** 
+	 * Initialize change listeners, making the interface respond to changes.
+	 */
+	private void initializeChangeListeners() {
+		// Assign change listener to focus property, unselecting entities when focus is lost.
+		// Assures that users from multiple roles cannot be selected simultaneously.
+    	equipmentListView.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    		if (newValue) {
+    			exerciseListView.getSelectionModel().clearSelection();
+    			exerciseGroupListView.getSelectionModel().clearSelection();
+    			workoutListView.getSelectionModel().clearSelection();
+    			noteListView.getSelectionModel().clearSelection();
+    		}
+    	});
+    	
+    	exerciseListView.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    		if (newValue) {
+    			equipmentListView.getSelectionModel().clearSelection();
+    			exerciseGroupListView.getSelectionModel().clearSelection();
+    			workoutListView.getSelectionModel().clearSelection();
+    			noteListView.getSelectionModel().clearSelection();
+    		}
+    	});
+    	
+    	exerciseGroupListView.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    		if (newValue) {
+    			equipmentListView.getSelectionModel().clearSelection();
+    			exerciseListView.getSelectionModel().clearSelection();
+    			workoutListView.getSelectionModel().clearSelection();
+    			noteListView.getSelectionModel().clearSelection();
+    		}
+    	});
+    	
+    	workoutListView.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    		if (newValue) {
+    			equipmentListView.getSelectionModel().clearSelection();
+    			exerciseListView.getSelectionModel().clearSelection();
+    			exerciseGroupListView.getSelectionModel().clearSelection();
+    			noteListView.getSelectionModel().clearSelection();
+    		}
+    	});
+    	
+    	noteListView.focusedProperty().addListener((observable, oldValue, newValue) -> {
+    		if (newValue) {
+    			equipmentListView.getSelectionModel().clearSelection();
+    			exerciseListView.getSelectionModel().clearSelection();
+    			exerciseGroupListView.getSelectionModel().clearSelection();
+    			workoutListView.getSelectionModel().clearSelection();
+    		}
+    	});
+	}
+	
+    private void initializeListViews() {
+    	equipmentListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	exerciseListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	exerciseGroupListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	workoutListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	noteListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	
+		equipmentListView.setCellFactory(customCellFactory(Equipment::getName));
+		exerciseListView.setCellFactory(customCellFactory(Exercise::getName));
+		exerciseGroupListView.setCellFactory(customCellFactory(ExerciseGroup::getName));
+		workoutListView.setCellFactory(customCellFactory(w -> String.format("#%s - %s", w.getWorkoutID(), w.getTimestamp())));
+		noteListView.setCellFactory(customCellFactory(Note::getTitle));
 	}
     
     private void initializeWorkoutLogTable() {
@@ -148,24 +268,35 @@ public class MainController {
     	resultLogTreeTableView.setShowRoot(false);
     }
 
+    /**
+	 * Runs any methods that require every controller to be initialized. This method
+	 * should only be invoked by the FXML Loader class.
+	 */
+	@PostInitialize
+	private void postInitialize() {
+		equipmentController = Loader.getController(View.POPUP_EQUIPMENT);
+		exerciseGroupController = Loader.getController(View.POPUP_EXERCISE_GROUP);
+		noteController = Loader.getController(View.POPUP_NOTE);
+	}
     
-    public void update() {
+    @Override
+	public void update() {
     	updateListViews();
     	updateWorkoutLogTable();
     	updateResultLogTable();
     }
 
 	private void updateListViews() {
-		equipmentListView.getItems().setAll(EquipmentQueryHandler.getEquipments());
-		exerciseListView.getItems().setAll(ExerciseQueryHandler.getExercises());
-		exerciseGroupListView.getItems().setAll(ExerciseGroupQueryHandler.getExerciseGroups());
-		workoutListView.getItems().setAll(WorkoutQueryHandler.getWorkouts());
-		noteListView.getItems().setAll(NoteQueryHandler.getNotes());
+		equipmentListView.getItems().setAll(EquipmentService.getEquipments());
+		exerciseListView.getItems().setAll(ExerciseService.getExercises());
+		exerciseGroupListView.getItems().setAll(ExerciseGroupService.getExerciseGroups());
+		workoutListView.getItems().setAll(WorkoutService.getWorkouts());
+		noteListView.getItems().setAll(NoteService.getNotes());
 	}
 	
 	private void updateWorkoutLogTable() {
 		// Fetch list of workouts from database
-		List<Workout> workouts = WorkoutQueryHandler.getWorkouts();
+		List<Workout> workouts = WorkoutService.getWorkouts();
 		
 		// Convert workouts to internal format
 		List<WorkoutTreeData> formattedWorkouts = workouts.stream()
@@ -179,7 +310,7 @@ public class MainController {
 
 	private void updateResultLogTable() {
 		// Fetch list of workouts from database
-		List<Workout> results = WorkoutQueryHandler.getWorkouts();
+		List<Workout> results = WorkoutService.getWorkouts();
 		
 		// Convert workouts to internal format
 		List<WorkoutTreeData> formattedResults = results.stream()
@@ -191,7 +322,18 @@ public class MainController {
 		resultLogTreeTableView.getSortOrder().clear();		
 	}
 
-
+	
+	private <T> Callback<ListView<T>, ListCell<T>> customCellFactory(Function<T, String> nameFunction) {
+    	return listView -> {
+			return new JFXListCell<T>() {
+				@Override
+				protected void updateItem(T item, boolean empty) {
+					super.updateItem(item, empty);
+					setText(item != null ? nameFunction.apply(item) : null);
+				}
+			};
+    	};
+    }
 	
 
 	/*
@@ -200,28 +342,44 @@ public class MainController {
     
     @FXML
     void handleAddEquipmentClick(ActionEvent event) {
-
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
 
     @FXML
     void handleAddExerciseClick(ActionEvent event) {
-
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
 
     @FXML
     void handleAddExerciseGroupClick(ActionEvent event) {
-
-    }
-
-    @FXML
-    void handleAddNoteClick(ActionEvent event) {
-
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
+    	exerciseGroupController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
 
     @FXML
     void handleAddWorkoutClick(ActionEvent event) {
-
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
+
+    @FXML
+    void handleAddNoteClick(ActionEvent event) {
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
+    	noteController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
+    }
+    
     
     /*
      * Edit
@@ -229,28 +387,44 @@ public class MainController {
     
     @FXML
     void handleEditEquipmentClick(ActionEvent event) {
-    	
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
     
     @FXML
     void handleEditExerciseClick(ActionEvent event) {
-    	
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
     
     @FXML
     void handleEditExerciseGroupClick(ActionEvent event) {
-    	
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
+    	exerciseGroupController.loadEditMode(exerciseGroupListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
+    }
+  
+    @FXML
+    void handleEditWorkoutClick(ActionEvent event) {
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
+    	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
     
     @FXML
     void handleEditNoteClick(ActionEvent event) {
-    	
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
+    	noteController.loadEditMode(noteListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.show();
     }
     
-    @FXML
-    void handleEditWorkoutClick(ActionEvent event) {
-
-    }
     
     /*
      * Delete
@@ -258,27 +432,32 @@ public class MainController {
     
     @FXML
     void handleDeleteEquipmentClick(ActionEvent event) {
-
+    	EquipmentService.deleteEquipments(equipmentListView.getSelectionModel().getSelectedItems());
+    	updateListViews();
     }
 
     @FXML
     void handleDeleteExerciseClick(ActionEvent event) {
-
+    	ExerciseService.deleteExercises(exerciseListView.getSelectionModel().getSelectedItems());
+    	updateListViews();
     }
 
     @FXML
     void handleDeleteExerciseGroupClick(ActionEvent event) {
-
+    	ExerciseGroupService.deleteExerciseGroups(exerciseGroupListView.getSelectionModel().getSelectedItems());
+    	updateListViews();
     }
 
     @FXML
     void handleDeleteNoteClick(ActionEvent event) {
-
+    	NoteService.deleteNotes(noteListView.getSelectionModel().getSelectedItems());
+    	updateListViews();
     }
 
     @FXML
     void handleDeleteWorkoutClick(ActionEvent event) {
-
+    	WorkoutService.deleteWorkouts(workoutListView.getSelectionModel().getSelectedItems());
+    	updateListViews();
     }
 
     /**
@@ -289,7 +468,7 @@ public class MainController {
     	
     	public WorkoutTreeData(Workout workout) {
 			this.id = new SimpleStringProperty(String.valueOf(workout.getWorkoutID()));
-			this.time = new SimpleStringProperty(new SimpleDateFormat("dd. MMM HH:mm").format(Timestamp.valueOf(LocalDateTime.of(workout.getDate().toLocalDate(), workout.getTime().toLocalTime()))));
+			this.time = new SimpleStringProperty(new SimpleDateFormat("dd. MMM HH:mm").format(workout.getTimestamp()));
 			this.duration = new SimpleStringProperty(workout.getDuration().toString());
 			this.shape = new SimpleStringProperty(String.valueOf(workout.getShape()));
 			this.performance = new SimpleStringProperty(String.valueOf(workout.getPerformance()));

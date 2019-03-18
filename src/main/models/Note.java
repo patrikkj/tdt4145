@@ -2,6 +2,7 @@ package main.models;
 
 public class Note {
 	private int noteID;
+	private String title;
 	private String text;
 	
 	
@@ -9,12 +10,13 @@ public class Note {
 		this.noteID = -1;
 	}
 	
-	public Note(String text) {
-		this(-1, text);
+	public Note(String title, String text) {
+		this(-1, title, text);
 	}
 	
-	public Note(int noteID, String text) {
+	public Note(int noteID, String title, String text) {
 		this.noteID = noteID;
+		this.title = title;
 		this.text = text;
 	}
 
@@ -27,6 +29,14 @@ public class Note {
 		this.noteID = noteID;
 	}
 
+	public String getTitle() {
+		return title;
+	}
+	
+	public void setTitle(String title) {
+		this.title = title;
+	}
+	
 	public String getText() {
 		return text;
 	}
