@@ -89,7 +89,7 @@ public class ExerciseIncludedInService {
 	 */
 	public static ExerciseIncludedIn extractExerciseIncludedInFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer exerciseIncludedInID = record.get(Integer.class, "exercise_included_in.exercise_included_in_id");
+		Integer exerciseIncludedInID = record.get("exercise_included_in.exercise_included_in_id");
 		if (exerciseIncludedInID == null)
 			return null;
 

@@ -79,12 +79,12 @@ public class NoteService {
 	 */
 	public static Note extractNoteFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer noteID = record.get(Integer.class, "note.note_id");
+		Integer noteID = record.get("note.note_id");
 		if (noteID == null)
 			return null;
 		
-		String title = record.get(String.class, "note.title");
-	    String text = record.get(String.class, "note.text");
+		String title = record.get("note.title");
+	    String text = record.get("note.text");
 	    
 		return new Note(noteID, title, text);
 	}

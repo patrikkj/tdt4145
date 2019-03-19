@@ -93,14 +93,14 @@ public class ExercisePerformedService {
 	 */
 	public static ExercisePerformed extractExercisePerformedFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer exercisePerformedID = record.get(Integer.class, "exercise_performed.exercise_performed_id");
+		Integer exercisePerformedID = record.get("exercise_performed.exercise_performed_id");
 		if (exercisePerformedID == null)
 			return null;
 
 		Workout workout = WorkoutService.extractWorkoutFromRecord(record);
 		Exercise exercise = ExerciseService.extractExerciseFromRecord(record);
-	    int numberOfSets = record.get(Integer.class, "exercise_performed.number_of_sets");
-	    int numberOfKilos = record.get(Integer.class, "exercise_performed.number_of_kilos");
+	    int numberOfSets = record.get("exercise_performed.number_of_sets");
+	    int numberOfKilos = record.get("exercise_performed.number_of_kilos");
 		
 	    return new ExercisePerformed(exercisePerformedID, workout, exercise, numberOfSets, numberOfKilos);
 	}

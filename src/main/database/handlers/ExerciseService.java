@@ -84,12 +84,12 @@ public class ExerciseService {
 	 */
 	public static Exercise extractExerciseFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer exerciseID = record.get(Integer.class, "exercise.exercise_id");
+		Integer exerciseID = record.get("exercise.exercise_id");
 		if (exerciseID == null)
 			return null;
 	    
-	    String name = record.get(String.class, "exercise.name");
-	    String description = record.get(String.class, "exercise.description");
+	    String name = record.get("exercise.name");
+	    String description = record.get("exercise.description");
 	    Equipment equipment = EquipmentService.extractEquipmentFromRecord(record);
 	    
 		return new Exercise(exerciseID, name, description, equipment);

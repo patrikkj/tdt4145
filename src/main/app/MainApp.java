@@ -1,32 +1,25 @@
 package main.app;
 
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import main.database.DatabaseManager;
 
-import javafx.application.Application;
-import javafx.stage.Stage;
-import main.utils.View;
 
-public class MainApp extends Application {
-	private static final List<Runnable> shutdownHooks = new ArrayList<>();
+public class MainApp {
+	
+	public void run() {
 
-	@Override
-	public void start(Stage stage) throws IOException {
-		StageManager.initialize(stage);
-		StageManager.displayView(View.MAIN);
+		System.out.println("Skriv kode her ... ");
+		
 	}
 	
-	@Override
-	public void stop() throws Exception {
-		shutdownHooks.forEach(Runnable::run);
-	}
 	
-	public static void addShutdownHook(Runnable runnable) {
-		shutdownHooks.add(runnable);
-	}
-
 	public static void main(String[] args) {
-		launch(args);
+		MainApp app = new MainApp();
+		DatabaseManager.openConnection();
+		app.run();
+		DatabaseManager.closeConnection();
 	}
+}
+
+enum State {
+	
 }

@@ -77,11 +77,11 @@ public class ExerciseGroupService {
 	 */
 	public static ExerciseGroup extractExerciseGroupFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer exerciseGroupID = record.get(Integer.class, "exercise_group.exercise_group_id");
+		Integer exerciseGroupID = record.get("exercise_group.exercise_group_id");
 		if (exerciseGroupID == null)
 			return null;
 		
-	    String name = record.get(String.class, "exercise_group.name");
+	    String name = record.get("exercise_group.name");
 		
 	    return new ExerciseGroup(exerciseGroupID, name);
 	}

@@ -79,12 +79,12 @@ public class EquipmentService {
 	 */
 	public static Equipment extractEquipmentFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer equipmentID = record.get(Integer.class, "equipment.equipment_id");
+		Integer equipmentID = record.get("equipment.equipment_id");
 		if (equipmentID == null)
 			return null;
 		
-		String name = record.get(String.class, "equipment.name");
-	    String description = record.get(String.class, "equipment.description");
+		String name = record.get("equipment.name");
+	    String description = record.get("equipment.description");
 		
 	    return new Equipment(equipmentID, name, description);
 	}

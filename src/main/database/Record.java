@@ -39,6 +39,26 @@ public class Record {
 	}
 	
 	/**
+	 * Returns the value to which the specified key is mapped.
+	 * Key can be of the form 'columnName' or 'tableName.columnName'.
+	 * @param attributeType the type of the returned value
+	 * @param key the key whose associated value is to be returned
+	 */
+	@SuppressWarnings("unchecked")
+	public <T> T get(String attr) {
+		Object value = map.get(attr);
+
+		if (!map.containsKey(attr))
+			throw new NoSuchElementException(String.format("There is no key with value '%s'. Accessible keys: [%s]", attr, map.keySet()));
+		try {
+			return (T) attr;
+		} catch (Exception e) {
+			throw new ClassCastException(String.format("Cast failed, record attribute '%s' holds a value of type '%s'.", attr, value.getClass().getSimpleName()));
+		}
+	}
+	
+	
+	/**
 	 * Converts a {@code ResultSet} passed by the JDBC to a list of Records.
 	 * Each {@code Record} corresponds to a row in the given {@code ResultSet}.
 	 */

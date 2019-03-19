@@ -91,14 +91,14 @@ public class WorkoutService {
 	 */
 	public static Workout extractWorkoutFromRecord(Record record) {
 		// Assert that record contains a valid instance of this class
-		Integer workoutID = record.get(Integer.class, "workout.workout_id");
+		Integer workoutID = record.get("workout.workout_id");
 		if (workoutID == null)
 			return null;
 		
-	    Timestamp timestamp = record.get(Timestamp.class, "workout.timestamp");
-	    Time duration = record.get(Time.class, "workout.duration");
-	    int shape = record.get(Integer.class, "workout.shape");
-	    int performance = record.get(Integer.class, "workout.performance");
+	    Timestamp timestamp = record.get("workout.timestamp");
+	    Time duration = record.get("workout.duration");
+	    int shape = record.get("workout.shape");
+	    int performance = record.get("workout.performance");
 	    Note note = NoteService.extractNoteFromRecord(record);
 	    
 		return new Workout(workoutID, timestamp, duration, shape, performance, note);
