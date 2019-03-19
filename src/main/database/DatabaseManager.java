@@ -45,52 +45,134 @@ public class DatabaseManager {
 	}
 	
 	
+	// Queries
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
 	public static List<Record> executeQuery(String query) {
-		ResultSet resultSet = null;
-		try {
-			Statement statement = connection.createStatement();
-			resultSet = statement.executeQuery(query);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
+		ResultSet resultSet = executeTimedQuery(query);
 		return Record.generateRecords(resultSet);
 	}	
 
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	public static List<Record> executeQuery(PreparedStatement preparedStatement) {
+		ResultSet resultSet = executeTimedQuery(preparedStatement);
+		return Record.generateRecords(resultSet);
+	}
+
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
 	public static List<Record> executeQuery(String preparedStatement, Object... args) {
-		ResultSet resultSet = null;
-		try {
-			resultSet = prepareStatement(preparedStatement, false, args).executeQuery();
-		} catch (SQLException e) {
-			e.printStackTrace();
-		}
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, false, args));
 		return Record.generateRecords(resultSet);
 	}
 	
-	public static int executeUpdate(String update) {
-		int linesChanged;
-		try {
-			Statement statement = connection.createStatement();
-			linesChanged = statement.executeUpdate(update);
-		} catch (SQLException e1) {
-			e1.printStackTrace();
-		}
-		return linesChanged;
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	@SafeVarargs
+	public static <T> List<Record> executeQuery(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, false, pairs));
+		return Record.generateRecords(resultSet);
 	}
+
 	
+	// Updates
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeUpdate(String update) {
+		return executeTimedUpdate(update);
+	}
+
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeUpdate(PreparedStatement preparedStatement) {
+		return executeTimedUpdate(preparedStatement);
+	}
+
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
 	public static int executeUpdate(String preparedStatement, Object... args) {
 		return executeTimedUpdate(prepareStatement(preparedStatement, false, args));
 	}
 	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	@SafeVarargs
+	public static <T> int executeUpdate(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		return executeTimedUpdate(prepareStatement(preparedStatement, false, pairs));
+	}
+
+	
+	// Insertion
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
 	public static int executeInsertGetID(String insert) {
 		return executeTimedInsertGetID(insert);
 	}
+	
+	/*
+	 * Sends update and reestablishes connection if lost.
+	 */
+	public static int executeInsertGetID(PreparedStatement preparedStatement) {
+		// TODO: MUST BE KEYGEN-STATEMENT!!
 
+		return executeTimedInsertGetID(preparedStatement);
+	}
+	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
 	public static int executeInsertGetID(String preparedStatement, Object... args) {
 		return executeTimedInsertGetID(prepareStatement(preparedStatement, true, args));
 	}
 	
+	/*
+	 * Sends query and reestablishes connection if lost.
+	 */
+	@SafeVarargs
+	public static <T> int executeInsertGetID(String preparedStatement, Pair<Class<T>, T>... pairs) {
+		return executeTimedInsertGetID(prepareStatement(preparedStatement, true, pairs));
+	}
+	
+	
 	// Private
-	private static ResultSet execute(PreparedStatement preparedStatement) {
+	/**
+	 * Executes query specified by {@code query} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static ResultSet executeTimedQuery(String query) {
+		ResultSet resultSet = null;
+		
+		
+		try {
+			Statement statement = connection.createStatement();
+			try {
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), query);
+			} catch (RuntimeException e) {
+				openConnection();
+				resultSet = executeWithTimer(() -> statement.executeQuery(query), query);
+			}
+		} catch (SQLException e1) {
+			e1.printStackTrace();
+		}
+		
+		return resultSet;
+	}
+	
+	/**
+	 * Executes query specified by {@code preparedStatement} and prints execution time to console.
+	 * Reattempts once if first execution fails.
+	 */
+	private static ResultSet executeTimedQuery(PreparedStatement preparedStatement) {
 		ResultSet resultSet = null;
 		
 		try {
