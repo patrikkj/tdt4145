@@ -1,6 +1,8 @@
 package main.core.ui;
 
+import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -16,8 +18,11 @@ import com.jfoenix.controls.JFXTimePicker;
 import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
+import com.jfoenix.validation.NumberValidator;
+import com.jfoenix.validation.base.ValidatorBase;
 
 import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
@@ -86,6 +91,7 @@ public class MainController implements Refreshable {
     
     // Workout Log
     private ObservableList<WorkoutTreeData> workoutTreeData;
+    private NumberValidator validator;
     @FXML private JFXTextField workoutCountTextField;
     @FXML private JFXTreeTableView<WorkoutTreeData> workoutLogTreeTableView;
     @FXML private TreeTableColumn<WorkoutTreeData, String> workoutLogIDColumn;
@@ -110,6 +116,10 @@ public class MainController implements Refreshable {
     @FXML private TreeTableColumn<WorkoutTreeData, String> resultLogPerformanceColumn;
     @FXML private TreeTableColumn<WorkoutTreeData, String> resultLogNoteColumn;
 
+    // Related exercises
+    @FXML private JFXComboBox<ExerciseGroup> relatedExerciseGroupComboBox;
+    @FXML private JFXListView<Exercise> relatedExercisesListView;
+    
     // Controller references
     private EquipmentPopupController equipmentController;
     private ExerciseGroupPopupController exerciseGroupController;
@@ -129,6 +139,7 @@ public class MainController implements Refreshable {
     	initializeListViews();
     	initializeWorkoutLogTable();
     	initializeResultLogTable();
+    	initializeRelatedExercises();
     	initializeBindings();
     	initializeChangeListeners();
     	update();
@@ -227,9 +238,20 @@ public class MainController implements Refreshable {
 	}
     
     private void initializeWorkoutLogTable() {
+    	// Input validation
+    	validator = new NumberValidator();
+    	validator.setMessage("Dette feltet må være et heltall.");
+		workoutCountTextField.getValidators().add(validator);
+		workoutCountTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+			if (newValue != null) {
+				workoutCountTextField.validate();
+				updateWorkoutLogTable();
+			}
+		});
+		
     	// Allow selection of multiple entities.
 		workoutLogTreeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);  	
-		
+
 		// Create observable list backing TreeTableView
 		workoutTreeData = FXCollections.observableArrayList();
 		
@@ -248,6 +270,22 @@ public class MainController implements Refreshable {
     }
 
     private void initializeResultLogTable() {
+    	// Add listener
+    	BooleanBinding isValidStartDate = startDatePicker.valueProperty().isNotNull();
+    	BooleanBinding isValidStartTime = startTimePicker.valueProperty().isNotNull();
+    	BooleanBinding isValidEndDate = endDatePicker.valueProperty().isNotNull();
+    	BooleanBinding isValidEndTime = endTimePicker.valueProperty().isNotNull();
+    	BooleanBinding isValidExercise = exerciseComboBox.getSelectionModel().selectedItemProperty().isNotNull();
+    	BooleanBinding isValidResultLog = isValidStartDate.and(isValidStartTime)
+    			.and(isValidEndDate)
+    			.and(isValidEndTime)
+    			.and(isValidExercise);
+    	
+    	isValidResultLog.addListener((obs, oldValue, newValue) -> {
+    		if (newValue)
+    			updateResultLogTable();
+    	});
+    	
     	// Allow selection of multiple entities.
     	resultLogTreeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);  	
     	
@@ -260,7 +298,7 @@ public class MainController implements Refreshable {
     	resultLogDurationColumn		.setCellValueFactory(cell -> cell.getValue().getValue().duration);
     	resultLogShapeColumn		.setCellValueFactory(cell -> cell.getValue().getValue().shape);
     	resultLogPerformanceColumn	.setCellValueFactory(cell -> cell.getValue().getValue().performance);
-    	resultLogNoteColumn		.setCellValueFactory(cell -> cell.getValue().getValue().note);
+    	resultLogNoteColumn			.setCellValueFactory(cell -> cell.getValue().getValue().note);
     	
     	// Assign root node to TreeTableView for holding users
     	TreeItem<WorkoutTreeData> root = new RecursiveTreeItem<WorkoutTreeData>(resultTreeData, RecursiveTreeObject::getChildren);
@@ -268,6 +306,12 @@ public class MainController implements Refreshable {
     	resultLogTreeTableView.setShowRoot(false);
     }
 
+    private void initializeRelatedExercises() {
+    	relatedExerciseGroupComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+    		updateRelatedExercises();
+    	});
+    }
+    
     /**
 	 * Runs any methods that require every controller to be initialized. This method
 	 * should only be invoked by the FXML Loader class.
@@ -295,8 +339,16 @@ public class MainController implements Refreshable {
 	}
 	
 	private void updateWorkoutLogTable() {
+		if (validator.getHasErrors()  
+				||  workoutCountTextField.getText() == null  
+				||  workoutCountTextField.getText().equals(""))
+			return;
+		
+		// Read count value
+		int n = Integer.parseInt(workoutCountTextField.getText());
+		
 		// Fetch list of workouts from database
-		List<Workout> workouts = WorkoutService.getWorkouts();
+		List<Workout> workouts = WorkoutService.getRecentWorkouts(n);
 		
 		// Convert workouts to internal format
 		List<WorkoutTreeData> formattedWorkouts = workouts.stream()
@@ -309,8 +361,18 @@ public class MainController implements Refreshable {
 	}
 
 	private void updateResultLogTable() {
+		if (startDatePicker.getValue() == null
+				|| startTimePicker.getValue() == null
+				|| endDatePicker.getValue() == null
+				|| endTimePicker.getValue() == null)
+			return;
+		
+		Exercise exercise = exerciseComboBox.getSelectionModel().getSelectedItem();
+		Timestamp from = Timestamp.valueOf(LocalDateTime.of(startDatePicker.getValue(), startTimePicker.getValue()));
+		Timestamp to = Timestamp.valueOf(LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue()));
+		
 		// Fetch list of workouts from database
-		List<Workout> results = WorkoutService.getWorkouts();
+		List<Workout> results = WorkoutService.getWorkoutByExerciseAndInterval(exercise, from, to);
 		
 		// Convert workouts to internal format
 		List<WorkoutTreeData> formattedResults = results.stream()
@@ -322,6 +384,9 @@ public class MainController implements Refreshable {
 		resultLogTreeTableView.getSortOrder().clear();		
 	}
 
+	private void updateRelatedExercises() {
+		
+	}
 	
 	private <T> Callback<ListView<T>, ListCell<T>> customCellFactory(Function<T, String> nameFunction) {
     	return listView -> {
@@ -405,7 +470,8 @@ public class MainController implements Refreshable {
     void handleEditExerciseGroupClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
     	exerciseGroupController.loadEditMode(exerciseGroupListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> updateListViews());
+//    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
   
@@ -476,4 +542,21 @@ public class MainController implements Refreshable {
 		}
     }
 
+    /**
+     * Custom implementation of {@link ValidatorBase} where errors can be triggered manually.
+     */
+    private class FieldValidator extends ValidatorBase {
+    	
+    	public FieldValidator() {
+    		
+    	}
+    	
+    	@Override
+    	protected void eval() {
+    	}
+    	
+    	public void setError(boolean error) {
+    		hasErrors.set(error);
+    	}
+    }
 }

@@ -8,6 +8,7 @@ import java.util.stream.Collectors;
 
 import main.database.DatabaseManager;
 import main.database.Record;
+import main.models.Exercise;
 import main.models.Note;
 import main.models.Workout;
 
@@ -33,7 +34,41 @@ public class WorkoutService {
 		List<Record> records = DatabaseManager.executeQuery(query, workoutID);
 		return extractWorkoutFromRecord(records.get(0));
 	}
-		
+	
+	/**
+	 * Returns a list containing the {@code n} most recent workouts.
+	 */
+	public static List<Workout> getRecentWorkouts(int n) {
+		String query = "SELECT * FROM workout AS a "
+				+ "LEFT JOIN note AS b ON a.note_id = b.note_id "
+				+ "ORDER BY a.timestamp DESC "
+				+ "LIMIT ?";
+		List<Record> records = DatabaseManager.executeQuery(query, n);
+		return records.stream()
+				.map(WorkoutService::extractWorkoutFromRecord)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Returns a list containing every {@code Workout} for a given exercise, 
+	 * constrained by the given time interval.
+	 */
+	public static List<Workout> getWorkoutByExerciseAndInterval(Exercise exercise, Timestamp from, Timestamp to) {
+		String query = "SELECT * FROM exercise_performed AS ep "
+				+ "INNER JOIN exercise AS e ON ep.exercise_id = e.exercise_id "
+				+ "INNER JOIN workout AS w ON ep.workout_id = w.workout_id "
+				+ "WHERE e.exercise_id = ? "
+				+ "AND w.timestamp BETWEEN ? AND ?";
+		System.out.println("Sending query: " + query);
+		List<Record> records = DatabaseManager.executeQuery(query, 
+				exercise.getExerciseID(),
+				from,
+				to);
+		return records.stream()
+				.map(WorkoutService::extractWorkoutFromRecord)
+				.collect(Collectors.toList());
+	}
+	
 	/**
 	 * Updates the database record for the workout specified.
 	 * @return the number of lines changed.

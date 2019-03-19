@@ -1,12 +1,10 @@
 package main.models;
 
-import java.sql.Date;
 import java.sql.Time;
 import java.sql.Timestamp;
 
 public class Workout {
 	private int workoutID;
-	private Date date;
 	private Timestamp timestamp;
 	private Time duration;
 	private int shape;
@@ -82,7 +80,7 @@ public class Workout {
 
 	@Override
 	public String toString() {
-		return String.format("Workout [workoutID=%s, date=%s, timestamp=%s, duration=%s, shape=%s, performance=%s, note=%s]",
-				workoutID, date, timestamp, duration, shape, performance, note);
+		return String.format("Workout [workoutID=%s, timestamp=%s, duration=%s, shape=%s, performance=%s, note=%s]",
+				workoutID, timestamp, duration, shape, performance, note);
 	}
 }

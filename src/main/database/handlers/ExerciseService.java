@@ -7,6 +7,7 @@ import main.database.DatabaseManager;
 import main.database.Record;
 import main.models.Equipment;
 import main.models.Exercise;
+import main.models.ExerciseGroup;
 
 public class ExerciseService {
 	// TODO: Might have to use Pair<Class, Object> implementation for null handling
@@ -29,6 +30,19 @@ public class ExerciseService {
 		String query = "SELECT * FROM exercise WHERE exercise_id = ?";
 		List<Record> records = DatabaseManager.executeQuery(query, exerciseID);
 		return extractExerciseFromRecord(records.get(0));
+	}
+	
+	/**
+	 * Returns a list of every exercise within the specified group of exercises.
+	 */
+	public static List<Exercise> getExercisesByGroup(ExerciseGroup exerciseGroup){
+		String query = "SELECT * FROM exercise_included_in AS eii "
+				+ "INNER JOIN exercise AS e ON eii.exercise_id = e.exercise_id "
+				+ "WHERE eii.exercise_group_id = ?";
+		List<Record> records = DatabaseManager.executeQuery(query, exerciseGroup.getExerciseGroupID());
+		return records.stream()
+				.map(ExerciseService::extractExerciseFromRecord)
+				.collect(Collectors.toList());
 	}
 	
 	/**
