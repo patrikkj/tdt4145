@@ -41,7 +41,9 @@ import main.app.Loader;
 import main.app.StageManager;
 import main.core.ui.popups.EquipmentPopupController;
 import main.core.ui.popups.ExerciseGroupPopupController;
+import main.core.ui.popups.ExercisePopupController;
 import main.core.ui.popups.NotePopupController;
+import main.core.ui.popups.WorkoutPopupController;
 import main.database.handlers.EquipmentService;
 import main.database.handlers.ExerciseGroupService;
 import main.database.handlers.ExerciseService;
@@ -122,7 +124,9 @@ public class MainController implements Refreshable {
     
     // Controller references
     private EquipmentPopupController equipmentController;
+    private ExercisePopupController exerciseController;
     private ExerciseGroupPopupController exerciseGroupController;
+    private WorkoutPopupController workoutController;
     private NotePopupController noteController;
     
     // Selection properties
@@ -145,10 +149,6 @@ public class MainController implements Refreshable {
     	update();
     }
     
-    /**
-	 * Initialize property bindings, making sure that the interface
-	 * is in a valid state by disallowing invalid actions.
-	 */
 	private void initializeBindings() {
     	equipmentSelectionSize = Bindings.size(equipmentListView.getSelectionModel().getSelectedItems());
     	exerciseSelectionSize = Bindings.size(exerciseListView.getSelectionModel().getSelectedItems());
@@ -171,9 +171,6 @@ public class MainController implements Refreshable {
     	deleteNoteButton.disableProperty().bind(noteSelectionSize.isEqualTo(0));
 	}
     
-	/** 
-	 * Initialize change listeners, making the interface respond to changes.
-	 */
 	private void initializeChangeListeners() {
 		// Assign change listener to focus property, unselecting entities when focus is lost.
 		// Assures that users from multiple roles cannot be selected simultaneously.
@@ -312,14 +309,12 @@ public class MainController implements Refreshable {
     	});
     }
     
-    /**
-	 * Runs any methods that require every controller to be initialized. This method
-	 * should only be invoked by the FXML Loader class.
-	 */
 	@PostInitialize
 	private void postInitialize() {
 		equipmentController = Loader.getController(View.POPUP_EQUIPMENT);
+		exerciseController = Loader.getController(View.POPUP_EXERCISE);
 		exerciseGroupController = Loader.getController(View.POPUP_EXERCISE_GROUP);
+		workoutController = Loader.getController(View.POPUP_WORKOUT);
 		noteController = Loader.getController(View.POPUP_NOTE);
 	}
     
@@ -409,15 +404,15 @@ public class MainController implements Refreshable {
     void handleAddEquipmentClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
     	equipmentController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
 
     @FXML
     void handleAddExerciseClick(ActionEvent event) {
-    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
-    	equipmentController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE);
+    	exerciseController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
 
@@ -425,15 +420,15 @@ public class MainController implements Refreshable {
     void handleAddExerciseGroupClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
     	exerciseGroupController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
 
     @FXML
     void handleAddWorkoutClick(ActionEvent event) {
-    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
-    	equipmentController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_WORKOUT);
+    	workoutController.loadCreateMode();
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
 
@@ -441,7 +436,7 @@ public class MainController implements Refreshable {
     void handleAddNoteClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
     	noteController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
     
@@ -454,15 +449,15 @@ public class MainController implements Refreshable {
     void handleEditEquipmentClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
     	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
     
     @FXML
     void handleEditExerciseClick(ActionEvent event) {
-    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
-    	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE);
+    	exerciseController.loadEditMode(exerciseListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
     
@@ -470,16 +465,15 @@ public class MainController implements Refreshable {
     void handleEditExerciseGroupClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
     	exerciseGroupController.loadEditMode(exerciseGroupListView.getSelectionModel().getSelectedItem());
-//    	dialog.setOnDialogClosed(e -> updateListViews());
     	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
   
     @FXML
     void handleEditWorkoutClick(ActionEvent event) {
-    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
-    	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_WORKOUT);
+    	workoutController.loadEditMode(workoutListView.getSelectionModel().getSelectedItem());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
     
@@ -487,7 +481,7 @@ public class MainController implements Refreshable {
     void handleEditNoteClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
     	noteController.loadEditMode(noteListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> updateListViews());
+    	dialog.setOnDialogClosed(e -> update());
     	dialog.show();
     }
     
@@ -499,31 +493,31 @@ public class MainController implements Refreshable {
     @FXML
     void handleDeleteEquipmentClick(ActionEvent event) {
     	EquipmentService.deleteEquipments(equipmentListView.getSelectionModel().getSelectedItems());
-    	updateListViews();
+    	update();
     }
 
     @FXML
     void handleDeleteExerciseClick(ActionEvent event) {
     	ExerciseService.deleteExercises(exerciseListView.getSelectionModel().getSelectedItems());
-    	updateListViews();
+    	update();
     }
 
     @FXML
     void handleDeleteExerciseGroupClick(ActionEvent event) {
     	ExerciseGroupService.deleteExerciseGroups(exerciseGroupListView.getSelectionModel().getSelectedItems());
-    	updateListViews();
+    	update();
+    }
+    
+    @FXML
+    void handleDeleteWorkoutClick(ActionEvent event) {
+    	WorkoutService.deleteWorkouts(workoutListView.getSelectionModel().getSelectedItems());
+    	update();
     }
 
     @FXML
     void handleDeleteNoteClick(ActionEvent event) {
     	NoteService.deleteNotes(noteListView.getSelectionModel().getSelectedItems());
-    	updateListViews();
-    }
-
-    @FXML
-    void handleDeleteWorkoutClick(ActionEvent event) {
-    	WorkoutService.deleteWorkouts(workoutListView.getSelectionModel().getSelectedItems());
-    	updateListViews();
+    	update();
     }
 
     /**

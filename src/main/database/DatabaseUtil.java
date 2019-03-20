@@ -58,8 +58,10 @@ public class DatabaseUtil {
 			preparedStatement.setInt(paramIndex, (Integer) arg);
 		else if (arg instanceof Boolean)
 			preparedStatement.setBoolean(paramIndex, (Boolean) arg);
+		else if (arg instanceof Timestamp)
+			preparedStatement.setTimestamp(paramIndex, (Timestamp) arg);
 		else if (arg instanceof Date)
-			preparedStatement.setDate(paramIndex, (Date) arg);
+			preparedStatement.setDate(paramIndex, (Date) arg);		
 		else if (arg instanceof LocalDate)
 			preparedStatement.setDate(paramIndex, Date.valueOf((LocalDate) arg));
 		else if (arg instanceof Time)

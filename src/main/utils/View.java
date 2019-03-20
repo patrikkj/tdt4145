@@ -4,12 +4,10 @@ public enum View {
 	// 							TITLE			Type				FXML path
 	MAIN(						"iExercise",	ViewType.SCENE,		"ui/Main.fxml"),
 	POPUP_EQUIPMENT(			null, 			ViewType.POPUP,		"ui/popups/EquipmentPopup.fxml"),
+	POPUP_EXERCISE(				null,			ViewType.POPUP,		"ui/popups/ExercisePopup.fxml"), 
 	POPUP_EXERCISE_GROUP(		null, 			ViewType.POPUP,		"ui/popups/ExerciseGroupPopup.fxml"),
+	POPUP_WORKOUT(				null, 			ViewType.POPUP,		"ui/popups/WorkoutPopup.fxml"),
 	POPUP_NOTE(					null, 			ViewType.POPUP,		"ui/popups/NotePopup.fxml");
-//	POPUP_ØVELSE(				null,			true,				"ui/popups/ØvelsePopup.fxml"), 
-//	POPUP_TRENINGSØKT(			null, 			true,				"ui/popups/TreningsøktPopup.fxml"),
-//	POPUP_ØVELSE_GRUPPE(		null, 			true,				"ui/popups/ØvelseGruppePopup.fxml"),
-//	POPUP_NOTAT(				null, 			true,				"ui/popups/NotatPopup.fxml");
 	
 	
 	private final String title;

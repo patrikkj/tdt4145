@@ -89,7 +89,7 @@ public class WorkoutService {
 	 * @return the auto-generated identifier.
 	 */
 	public static int insertWorkoutAssignID(Workout workout) {
-		String insert = "INSERT INTO workout (timestamp, duration, shape, performance, note_id) VALUES (?, ?, ?, ?, ?, ?)";
+		String insert = "INSERT INTO workout (timestamp, duration, shape, performance, note_id) VALUES (?, ?, ?, ?, ?)";
 		int workoutID = DatabaseManager.executeInsertGetID(insert,
 				workout.getTimestamp(),
 				workout.getDuration(),

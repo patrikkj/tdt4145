@@ -209,10 +209,26 @@
 	-jfx-focus-color: -fx-dark-grey-1;
 }
 
+.input-field-light-bg-small {
+	-fx-font-size: 11px;
+	-fx-text-fill: -fx-text-unfocused;
+	-jfx-focus-color: -fx-dark-grey-1;
+}
+
 .input-field-light-bg:focused {
 	-fx-text-fill: -fx-text-focused;
 }
 
 .input-field-light-bg .error-label {
 	-fx-font: normal 10px gabriola;
+}
+
+.split-pane {
+	-fx-border-color: transparent;
+  	-fx-background-insets: 0, 0, 1, 2;
+	-fx-focus-color: transparent;
+	-fx-faint-focus-color: transparent;
+}
+.split-pane .split-pane-divider {
+	visibility: false;
 }

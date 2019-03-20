@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXComboBox?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import com.jfoenix.controls.JFXTextArea?>
+<?import com.jfoenix.controls.JFXTextField?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.effect.Blend?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.Region?>
+<?import javafx.scene.layout.StackPane?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
+
+<StackPane prefWidth="400.0" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.core.ui.popups.ExercisePopupController">
+   <children>
+      <StackPane stylesheets="@../../stylesheet.css">
+         <children>
+            <VBox focusTraversable="true" spacing="30.0">
+               <children>
+                  <Label fx:id="headerLabel" alignment="CENTER" maxWidth="1.7976931348623157E308" styleClass="header-text" text="Header" />
+                  <HBox spacing="20.0">
+                     <children>
+                        <VBox alignment="TOP_CENTER" focusTraversable="true" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="250.0" spacing="30.0">
+                           <children>
+                              <JFXTextField fx:id="nameTextField" labelFloat="true" promptText="Navn" styleClass="input-field-light-bg" />
+                              <JFXTextArea fx:id="descriptionTextArea" labelFloat="true" prefHeight="100.0" prefWidth="250.0" promptText="Beskrivelse" styleClass="input-field-light-bg" />
+                              <JFXComboBox fx:id="equipmentComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Apparat" />
+                           </children>
+                        </VBox>
+                        <Separator orientation="VERTICAL" prefHeight="200.0" />
+                        <VBox maxWidth="-Infinity" minWidth="-Infinity" prefHeight="300.0" prefWidth="250.0" spacing="10.0">
+                           <children>
+                              <Label maxWidth="1.7976931348623157E308" text="Tilhørende øvelsesgrupper" textAlignment="CENTER">
+                                 <font>
+                                    <Font name="System Bold" size="12.0" />
+                                 </font>
+                                 <VBox.margin>
+                                    <Insets bottom="5.0" />
+                                 </VBox.margin>
+                              </Label>
+                              <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="5.0">
+                                 <children>
+                                    <JFXComboBox fx:id="exerciseGroupComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Øvelsesgruppe" HBox.hgrow="ALWAYS" />
+                                    <JFXButton fx:id="addExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
+                                    <JFXButton fx:id="deleteExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
+                                 </children>
+                              </HBox>
+                              <JFXListView fx:id="exerciseGroupListView" prefHeight="100.0" VBox.vgrow="ALWAYS">
+                                 <VBox.margin>
+                                    <Insets top="10.0" />
+                                 </VBox.margin>
+                              </JFXListView>
+                           </children>
+                        </VBox>
+                     </children>
+                  </HBox>
+                  <HBox nodeOrientation="RIGHT_TO_LEFT">
+                     <children>
+                        <Region HBox.hgrow="ALWAYS" />
+                        <JFXButton fx:id="actionButton" buttonType="RAISED" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" onAction="#handleActionClick" prefHeight="30.0" prefWidth="120.0" styleClass="primary-button-grey" text="Action">
+                           <effect>
+                              <Blend mode="EXCLUSION" />
+                           </effect>
+                           <font>
+                              <Font name="System Bold" size="13.0" />
+                           </font>
+                        </JFXButton>
+                        <Region HBox.hgrow="ALWAYS" />
+                     </children>
+                     <VBox.margin>
+                        <Insets />
+                     </VBox.margin>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets bottom="20.0" left="40.0" right="40.0" top="20.0" />
+               </padding>
+            </VBox>
+         </children>
+      </StackPane>
+   </children>
+</StackPane>
