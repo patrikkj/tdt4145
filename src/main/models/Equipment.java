@@ -47,6 +47,6 @@ public class Equipment {
 
 	@Override
 	public String toString() {
-		return String.format("Equipment [equipmentID=%s, name=%s, description=%s]", equipmentID, name, description);
+		return name;
 	}
 }

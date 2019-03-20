@@ -223,6 +223,11 @@
 	-fx-font: normal 10px gabriola;
 }
 
+.error-text-field:error {
+	-jfx-unfocus-color: #900000;
+	-jfx-focus-color: #900000;
+}
+
 .split-pane {
 	-fx-border-color: transparent;
   	-fx-background-insets: 0, 0, 1, 2;

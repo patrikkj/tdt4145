@@ -14,12 +14,22 @@ import com.jfoenix.controls.JFXListView;
 import com.jfoenix.controls.JFXSlider;
 import com.jfoenix.controls.JFXTextField;
 import com.jfoenix.controls.JFXTimePicker;
+import com.jfoenix.validation.NumberValidator;
 
+import javafx.beans.binding.Bindings;
+import javafx.beans.binding.BooleanBinding;
+import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.BooleanProperty;
+import javafx.beans.property.ReadOnlyBooleanProperty;
+import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
+import javafx.scene.control.SelectionMode;
+import main.database.handlers.ExerciseService;
 import main.database.handlers.NoteService;
 import main.database.handlers.WorkoutService;
+import main.database.handlers.relations.ExercisePerformedService;
 import main.models.Exercise;
 import main.models.Note;
 import main.models.Workout;
@@ -33,19 +43,84 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     @FXML private JFXSlider shapeSlider;
     @FXML private JFXSlider performanceSlider;
     @FXML private JFXComboBox<Note> noteComboBox;
+
     @FXML private JFXButton addExercisePerformedButton;
     @FXML private JFXButton deleteExercisePerformedButton;
-    @FXML private JFXComboBox<Exercise> exerciseomboBox;
-    @FXML private JFXListView<ExercisePerformed> exercisePerformedListView;
+
+    @FXML private JFXListView<ExercisePerformed> exerciseListView;
+    @FXML private JFXComboBox<Exercise> exerciseComboBox;
+    @FXML private JFXTextField numberOfSetsTextField;
+    @FXML private JFXTextField numberOfKilosTextField;
+    
     @FXML private JFXButton actionButton;
 
 
-    @FXML private JFXTextField numberOfSetsTextField;
-    @FXML private JFXTextField numberOfKilosTextField;
-
-
     private Workout workout;
+    private NumberValidator numberOfSetsValidator;
+    private NumberValidator numberOfKilosValidator;
+    
+    private BooleanBinding isValidExerciseProperty;
+    private ReadOnlyBooleanProperty numberOfSetsErrorProperty;
+    private ReadOnlyBooleanProperty numberOfKilosErrorProperty;
+    private BooleanBinding numberOfSetsIsEmpty;
+    private BooleanBinding numberOfKilosIsEmpty;
+    private SimpleBooleanProperty valuesRequired;
 
+    private IntegerBinding exerciseSelectionSize;
+
+    
+    @FXML
+    private void initialize() {
+    	valuesRequired = new SimpleBooleanProperty();
+    	exerciseComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
+    		if (newValue == null  ||  newValue.getEquipment() == null) {
+    			numberOfSetsTextField.setDisable(true);
+    			numberOfKilosTextField.setDisable(true);
+    			numberOfSetsTextField.clear();
+    			numberOfKilosTextField.clear();
+    			valuesRequired.set(false);
+    		} else {
+    			numberOfSetsTextField.setDisable(false);
+    			numberOfKilosTextField.setDisable(false);
+    			valuesRequired.set(true);
+    		}
+    	});
+    	
+    	numberOfSetsValidator = new NumberValidator();
+    	numberOfSetsValidator.setMessage("Dette feltet må være et tall.");
+		numberOfSetsTextField.getValidators().add(numberOfSetsValidator);
+		numberOfSetsTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+			numberOfSetsTextField.validate();
+		});
+
+		numberOfKilosValidator = new NumberValidator();
+		numberOfKilosValidator.setMessage("Dette feltet må være et tall.");
+		numberOfKilosTextField.getValidators().add(numberOfSetsValidator);
+		numberOfKilosTextField.textProperty().addListener((obs, oldValue, newValue) -> {
+			numberOfKilosTextField.validate();
+		});
+		
+		isValidExerciseProperty = exerciseComboBox.valueProperty().isNotNull();
+		numberOfSetsErrorProperty = numberOfSetsValidator.hasErrorsProperty();
+		numberOfKilosErrorProperty = numberOfKilosValidator.hasErrorsProperty();
+		
+		numberOfSetsIsEmpty = numberOfSetsTextField.textProperty().isEqualTo("");
+	    numberOfKilosIsEmpty = numberOfKilosTextField.textProperty().isEqualTo("");
+		
+		// Disable add button binding
+		addExercisePerformedButton.disableProperty().bind(
+				isValidExerciseProperty.not()
+				.or(numberOfSetsErrorProperty)
+				.or(numberOfKilosErrorProperty)
+				.or(valuesRequired
+						.and(numberOfSetsIsEmpty
+								.or(numberOfKilosIsEmpty))));
+		
+		// Disable delete button binding and permit multi-select
+    	exerciseListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
+    	exerciseSelectionSize = Bindings.size(exerciseListView.getSelectionModel().getSelectedItems());
+    	deleteExercisePerformedButton.disableProperty().bind(exerciseSelectionSize.isEqualTo(0));
+    }
 
 	@Override
 	public void loadCreateMode() {
@@ -53,9 +128,16 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 		headerLabel.setText("Ny treningsøkt");
 		actionButton.setText("Registrer");
 		
-		// Fill combobox
+		// Fill Note combobox
     	List<Note> notes = NoteService.getNotes();
     	noteComboBox.getItems().setAll(notes);
+    	
+    	// Fill ListView
+    	exerciseListView.getItems().clear();
+    	
+    	// Fill Exercise combobox
+    	List<Exercise> exercises = ExerciseService.getExercises();
+    	exerciseComboBox.getItems().setAll(exercises);
     	
 		// Create empty model
     	this.workout = new Workout();
@@ -70,9 +152,17 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	// Save model reference
     	this.workout = workout;
     	
-    	// Fill combobox
+    	// Fill Note combobox
     	List<Note> notes = NoteService.getNotes();
     	noteComboBox.getItems().setAll(notes);
+    	
+    	// Fill ListView
+    	List<ExercisePerformed> exercisesRelationsInWorkout = ExercisePerformedService.getExercisePerformedRelationsByWorkout(workout);
+    	exerciseListView.getItems().setAll(exercisesRelationsInWorkout);
+    	
+    	// Fill Exercise combobox
+    	List<Exercise> exercisesNotInWorkout = ExerciseService.getExercisesNotInWorkout(workout);
+    	exerciseComboBox.getItems().setAll(exercisesNotInWorkout);
     	
     	// Find note for selection
     	Note noteFromWorkout = workout.getNote() == null ? null :
@@ -85,7 +175,7 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	dateDatePicker.setValue(workout.getTimestamp() != null ? workout.getTimestamp().toLocalDateTime().toLocalDate() : null);
     	timeTimePicker.setValue(workout.getTimestamp() != null ? workout.getTimestamp().toLocalDateTime().toLocalTime() : null);
     	durationTimePicker.setValue(workout.getDuration() != null ? workout.getDuration().toLocalTime() : null);
-    	shapeSlider.setValue(workout.getShape());
+    	shapeSlider.setValue(workout.getShape() != null ? workout.getShape() : 5);
     	performanceSlider.setValue(workout.getPerformance());
     	noteComboBox.getSelectionModel().select(noteFromWorkout);
 	}
@@ -96,11 +186,6 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 		LocalTime time = timeTimePicker.getValue();
 		LocalDateTime dateTime = date != null && time != null ? LocalDateTime.of(date, time) : null;
 		Timestamp timestamp = dateTime != null ? Timestamp.valueOf(dateTime) : null;
-		
-		System.out.println(date);
-		System.out.println(time);
-		System.out.println(dateTime);
-		System.out.println(timestamp);
 		
 		LocalTime duration = durationTimePicker.getValue();
 		
@@ -120,18 +205,39 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	performanceSlider.setValue(5);
     	noteComboBox.getSelectionModel().clearSelection();
     	noteComboBox.getItems().clear();
-    	
+    	exerciseComboBox.getItems().clear();
+    	exerciseListView.getItems().clear();
+    	numberOfSetsTextField.clear();
+    	numberOfKilosTextField.clear();
 	}
 	
 
     @FXML
     void handleAddExercisePerformedClick(ActionEvent event) {
-
+    	Exercise exercise = exerciseComboBox.getSelectionModel().getSelectedItem();
+    	
+    	// Read count value
+    	Integer numberOfSets = numberOfSetsTextField.getText() != "" ? Integer.parseInt(numberOfSetsTextField.getText()) : null;
+    	Integer numberOfKilos = numberOfKilosTextField.getText() != "" ? Integer.parseInt(numberOfKilosTextField.getText()) : null;
+    	
+//    	if (validator.getHasErrors()  
+//				||  workoutCountTextField.getText() == null  
+//				||  workoutCountTextField.getText().equals(""))
+//			return;
+    	
+    	// Add to ListView
+    	exerciseListView.getItems().add(new ExercisePerformed(null, exercise, numberOfSets, numberOfKilos));
+    	
+    	// Remove from ComboBox
+    	exerciseComboBox.getItems().remove(exercise);
+    	exerciseComboBox.getSelectionModel().clearSelection();
     }
+    
 
     @FXML
     void handleDeleteExercisePerformedClick(ActionEvent event) {
-
+    	ExercisePerformed selectedExercisePerformed = exerciseListView.getSelectionModel().getSelectedItem();
+    	exerciseListView.getItems().remove(selectedExercisePerformed);
     }
 
     @FXML
@@ -143,8 +249,17 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 			break;
 		case EDIT:
 			WorkoutService.updateWorkout(workout);
+			
+			// Delete old relations
+			ExercisePerformedService.deleteExercisePerformedRelationsByWorkout(workout);
 			break;
 		}
+
+    	// Configure and insert new relations
+    	List<ExercisePerformed> exercisePerformedRelations = exerciseListView.getItems();
+    	exercisePerformedRelations.forEach(ep -> ep.setWorkout(workout));
+    	ExercisePerformedService.insertExercisePerformedRelations(exercisePerformedRelations);
+
     	dialog.close();
     }
 }

@@ -2,7 +2,9 @@ package main.core.ui;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -24,8 +26,11 @@ import com.jfoenix.validation.base.ValidatorBase;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
+import javafx.beans.property.ObjectProperty;
+import javafx.beans.property.ReadOnlyObjectProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.beans.value.ChangeListener;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.event.ActionEvent;
@@ -120,7 +125,7 @@ public class MainController implements Refreshable {
 
     // Related exercises
     @FXML private JFXComboBox<ExerciseGroup> relatedExerciseGroupComboBox;
-    @FXML private JFXListView<Exercise> relatedExercisesListView;
+    @FXML private JFXListView<Exercise> relatedExerciseGroupListView;
     
     // Controller references
     private EquipmentPopupController equipmentController;
@@ -130,6 +135,13 @@ public class MainController implements Refreshable {
     private NotePopupController noteController;
     
     // Selection properties
+    private ObjectProperty<LocalDate> isValidStartDate;
+    private ObjectProperty<LocalTime> isValidStartTime;
+    private ObjectProperty<LocalDate> isValidEndDate;
+    private ObjectProperty<LocalTime> isValidEndTime;
+    private ReadOnlyObjectProperty<Exercise> isValidExercise;
+    private BooleanBinding isValidResultLog;
+    
     private IntegerBinding equipmentSelectionSize;
     private IntegerBinding exerciseSelectionSize;
     private IntegerBinding exerciseGroupSelectionSize;
@@ -146,6 +158,7 @@ public class MainController implements Refreshable {
     	initializeRelatedExercises();
     	initializeBindings();
     	initializeChangeListeners();
+    	
     	update();
     }
     
@@ -240,14 +253,14 @@ public class MainController implements Refreshable {
     	validator.setMessage("Dette feltet må være et heltall.");
 		workoutCountTextField.getValidators().add(validator);
 		workoutCountTextField.textProperty().addListener((obs, oldValue, newValue) -> {
-			if (newValue != null) {
-				workoutCountTextField.validate();
+			if (newValue != null  &&  workoutCountTextField.validate())
 				updateWorkoutLogTable();
-			}
+			else
+				workoutTreeData.clear();
 		});
 		
     	// Allow selection of multiple entities.
-		workoutLogTreeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);  	
+		workoutLogTreeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);
 
 		// Create observable list backing TreeTableView
 		workoutTreeData = FXCollections.observableArrayList();
@@ -267,21 +280,31 @@ public class MainController implements Refreshable {
     }
 
     private void initializeResultLogTable() {
-    	// Add listener
-    	BooleanBinding isValidStartDate = startDatePicker.valueProperty().isNotNull();
-    	BooleanBinding isValidStartTime = startTimePicker.valueProperty().isNotNull();
-    	BooleanBinding isValidEndDate = endDatePicker.valueProperty().isNotNull();
-    	BooleanBinding isValidEndTime = endTimePicker.valueProperty().isNotNull();
-    	BooleanBinding isValidExercise = exerciseComboBox.getSelectionModel().selectedItemProperty().isNotNull();
-    	BooleanBinding isValidResultLog = isValidStartDate.and(isValidStartTime)
-    			.and(isValidEndDate)
-    			.and(isValidEndTime)
-    			.and(isValidExercise);
-    	
-    	isValidResultLog.addListener((obs, oldValue, newValue) -> {
-    		if (newValue)
+    	// Create changeListener
+    	ChangeListener<Object> changeListener = (obs, oldValue, newValue) -> {
+    		System.out.format("Null check: %s, isValidResultLog: %s%n", newValue != null, isValidResultLog.get());
+    		if (newValue != null  &&  isValidResultLog.get())
     			updateResultLogTable();
-    	});
+    		else
+    			resultTreeData.clear();
+    	};
+    	
+    	// Add listener
+    	isValidStartDate = startDatePicker.valueProperty();
+    	isValidStartTime = startTimePicker.valueProperty();
+    	isValidEndDate = endDatePicker.valueProperty();
+    	isValidEndTime = endTimePicker.valueProperty();
+    	isValidExercise = exerciseComboBox.getSelectionModel().selectedItemProperty();
+    	isValidResultLog = isValidStartDate.isNotNull().and(isValidStartTime.isNotNull())
+    			.and(isValidEndDate.isNotNull())
+    			.and(isValidEndTime.isNotNull())
+    			.and(isValidExercise.isNotNull());
+    	
+    	isValidStartDate.addListener(changeListener);
+    	isValidStartTime.addListener(changeListener);
+    	isValidEndDate.addListener(changeListener);
+    	isValidEndTime.addListener(changeListener);
+    	isValidExercise.addListener(changeListener);
     	
     	// Allow selection of multiple entities.
     	resultLogTreeTableView.getSelectionModel().setSelectionMode(SelectionMode.SINGLE);  	
@@ -318,19 +341,72 @@ public class MainController implements Refreshable {
 		noteController = Loader.getController(View.POPUP_NOTE);
 	}
     
+	
     @Override
 	public void update() {
-    	updateListViews();
+    	updateData();
     	updateWorkoutLogTable();
     	updateResultLogTable();
     }
 
-	private void updateListViews() {
-		equipmentListView.getItems().setAll(EquipmentService.getEquipments());
-		exerciseListView.getItems().setAll(ExerciseService.getExercises());
-		exerciseGroupListView.getItems().setAll(ExerciseGroupService.getExerciseGroups());
-		workoutListView.getItems().setAll(WorkoutService.getWorkouts());
-		noteListView.getItems().setAll(NoteService.getNotes());
+    private void updateData() {
+    	List<Equipment> equipments = EquipmentService.getEquipments();
+    	List<Exercise> exercises = ExerciseService.getExercises();
+    	List<ExerciseGroup> exerciseGroups = ExerciseGroupService.getExerciseGroups();
+    	List<Workout> workouts = WorkoutService.getWorkouts();
+    	List<Note> notes = NoteService.getNotes();
+    	
+    	equipmentListView.getItems().setAll(equipments);
+    	exerciseListView.getItems().setAll(exercises);
+    	exerciseGroupListView.getItems().setAll(exerciseGroups);
+    	workoutListView.getItems().setAll(workouts);
+    	noteListView.getItems().setAll(notes);
+    	
+    	exerciseListView.getItems().setAll(exercises);
+    	exerciseComboBox.getItems().setAll(exercises);
+    	relatedExerciseGroupComboBox.getItems().setAll(exerciseGroups);
+    }
+    
+	private void updateEntity(Entity entity) {
+		switch (entity) {
+		case EQUIPMENT:
+			equipmentListView.getItems().setAll(EquipmentService.getEquipments());
+			break;
+			
+		case EXERCISE:
+			List<Exercise> exercises = ExerciseService.getExercises();
+			exerciseListView.getItems().setAll(exercises);
+			exerciseComboBox.getItems().setAll(exercises);
+			updateRelatedExercises();
+			
+//			// If previously selected exercise was removed
+//			exerciseComboBox.getSelectionModel().clearSelection();
+			
+			break;
+			
+		case EXERCISE_GROUP:
+			List<ExerciseGroup> exerciseGroups = ExerciseGroupService.getExerciseGroups();
+			exerciseGroupListView.getItems().setAll(exerciseGroups);
+	    	relatedExerciseGroupComboBox.getItems().setAll(exerciseGroups);
+			updateRelatedExercises();
+			break;
+			
+		case WORKOUT:
+			workoutListView.getItems().setAll(WorkoutService.getWorkouts());
+			updateWorkoutLogTable();
+			updateResultLogTable();
+			break;
+			
+		case NOTE:
+			noteListView.getItems().setAll(NoteService.getNotes());
+			updateWorkoutLogTable();
+			updateResultLogTable();
+			break;
+			
+			
+		default:
+			break;
+		}
 	}
 	
 	private void updateWorkoutLogTable() {
@@ -359,7 +435,8 @@ public class MainController implements Refreshable {
 		if (startDatePicker.getValue() == null
 				|| startTimePicker.getValue() == null
 				|| endDatePicker.getValue() == null
-				|| endTimePicker.getValue() == null)
+				|| endTimePicker.getValue() == null
+				|| exerciseComboBox.getSelectionModel().getSelectedItem() == null)
 			return;
 		
 		Exercise exercise = exerciseComboBox.getSelectionModel().getSelectedItem();
@@ -378,10 +455,19 @@ public class MainController implements Refreshable {
 		resultLogTreeTableView.getSelectionModel().clearSelection();
 		resultLogTreeTableView.getSortOrder().clear();		
 	}
+	
+	
 
 	private void updateRelatedExercises() {
+		ExerciseGroup exerciseGroup = relatedExerciseGroupComboBox.getSelectionModel().getSelectedItem();
 		
+		if (exerciseGroup != null)
+			relatedExerciseGroupListView.getItems().setAll(ExerciseService.getExercisesInGroup(exerciseGroup));
+		else
+			relatedExerciseGroupListView.getItems().clear();
 	}
+	
+	
 	
 	private <T> Callback<ListView<T>, ListCell<T>> customCellFactory(Function<T, String> nameFunction) {
     	return listView -> {
@@ -404,7 +490,7 @@ public class MainController implements Refreshable {
     void handleAddEquipmentClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
     	equipmentController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EQUIPMENT));
     	dialog.show();
     }
 
@@ -412,7 +498,7 @@ public class MainController implements Refreshable {
     void handleAddExerciseClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE);
     	exerciseController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EXERCISE));
     	dialog.show();
     }
 
@@ -420,7 +506,7 @@ public class MainController implements Refreshable {
     void handleAddExerciseGroupClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
     	exerciseGroupController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EXERCISE_GROUP));
     	dialog.show();
     }
 
@@ -428,7 +514,7 @@ public class MainController implements Refreshable {
     void handleAddWorkoutClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_WORKOUT);
     	workoutController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.WORKOUT));
     	dialog.show();
     }
 
@@ -436,7 +522,7 @@ public class MainController implements Refreshable {
     void handleAddNoteClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
     	noteController.loadCreateMode();
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.NOTE));
     	dialog.show();
     }
     
@@ -449,7 +535,7 @@ public class MainController implements Refreshable {
     void handleEditEquipmentClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EQUIPMENT);
     	equipmentController.loadEditMode(equipmentListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EQUIPMENT));
     	dialog.show();
     }
     
@@ -457,7 +543,7 @@ public class MainController implements Refreshable {
     void handleEditExerciseClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE);
     	exerciseController.loadEditMode(exerciseListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EXERCISE));
     	dialog.show();
     }
     
@@ -465,7 +551,7 @@ public class MainController implements Refreshable {
     void handleEditExerciseGroupClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_EXERCISE_GROUP);
     	exerciseGroupController.loadEditMode(exerciseGroupListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.EXERCISE_GROUP));
     	dialog.show();
     }
   
@@ -473,7 +559,7 @@ public class MainController implements Refreshable {
     void handleEditWorkoutClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_WORKOUT);
     	workoutController.loadEditMode(workoutListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.WORKOUT));
     	dialog.show();
     }
     
@@ -481,7 +567,7 @@ public class MainController implements Refreshable {
     void handleEditNoteClick(ActionEvent event) {
     	JFXDialog dialog = StageManager.createPopupDialog(rootPane, View.POPUP_NOTE);
     	noteController.loadEditMode(noteListView.getSelectionModel().getSelectedItem());
-    	dialog.setOnDialogClosed(e -> update());
+    	dialog.setOnDialogClosed(e -> updateEntity(Entity.NOTE));
     	dialog.show();
     }
     
@@ -493,31 +579,31 @@ public class MainController implements Refreshable {
     @FXML
     void handleDeleteEquipmentClick(ActionEvent event) {
     	EquipmentService.deleteEquipments(equipmentListView.getSelectionModel().getSelectedItems());
-    	update();
+    	updateEntity(Entity.EQUIPMENT);
     }
 
     @FXML
     void handleDeleteExerciseClick(ActionEvent event) {
     	ExerciseService.deleteExercises(exerciseListView.getSelectionModel().getSelectedItems());
-    	update();
+    	updateEntity(Entity.EXERCISE);
     }
 
     @FXML
     void handleDeleteExerciseGroupClick(ActionEvent event) {
     	ExerciseGroupService.deleteExerciseGroups(exerciseGroupListView.getSelectionModel().getSelectedItems());
-    	update();
+    	updateEntity(Entity.EXERCISE_GROUP);
     }
     
     @FXML
     void handleDeleteWorkoutClick(ActionEvent event) {
     	WorkoutService.deleteWorkouts(workoutListView.getSelectionModel().getSelectedItems());
-    	update();
+    	updateEntity(Entity.WORKOUT);
     }
 
     @FXML
     void handleDeleteNoteClick(ActionEvent event) {
     	NoteService.deleteNotes(noteListView.getSelectionModel().getSelectedItems());
-    	update();
+    	updateEntity(Entity.NOTE);
     }
 
     /**
@@ -528,11 +614,16 @@ public class MainController implements Refreshable {
     	
     	public WorkoutTreeData(Workout workout) {
 			this.id = new SimpleStringProperty(String.valueOf(workout.getWorkoutID()));
-			this.time = new SimpleStringProperty(new SimpleDateFormat("dd. MMM HH:mm").format(workout.getTimestamp()));
-			this.duration = new SimpleStringProperty(workout.getDuration().toString());
+			
+			String timestamp = workout.getTimestamp() != null ? new SimpleDateFormat("dd. MMM HH:mm").format(workout.getTimestamp()) : "-";
+			String duration = workout.getDuration() != null ? workout.getDuration().toString() : "-";
+			String note = workout.getNote() != null ? workout.getNote().getText() : "-";
+			
+			this.time = new SimpleStringProperty(timestamp);
+			this.duration = new SimpleStringProperty(duration);
 			this.shape = new SimpleStringProperty(String.valueOf(workout.getShape()));
 			this.performance = new SimpleStringProperty(String.valueOf(workout.getPerformance()));
-			this.note = new SimpleStringProperty(workout.getNote() != null ? workout.getNote().getText() : "-");
+			this.note = new SimpleStringProperty(note);
 		}
     }
 
@@ -553,4 +644,9 @@ public class MainController implements Refreshable {
     		hasErrors.set(error);
     	}
     }
+
+    public enum Entity {
+    	EQUIPMENT, EXERCISE, EXERCISE_GROUP, WORKOUT, NOTE;
+    }
+    
 }

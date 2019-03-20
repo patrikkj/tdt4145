@@ -7,8 +7,8 @@ public class Workout {
 	private int workoutID;
 	private Timestamp timestamp;
 	private Time duration;
-	private int shape;
-	private int performance;
+	private Integer shape;
+	private Integer performance;
 	private Note note;
 	
 	
@@ -16,11 +16,11 @@ public class Workout {
 		this.workoutID = -1;
 	}
 
-	public Workout(Timestamp timestamp, Time duration, int shape, int performance, Note note) {
+	public Workout(Timestamp timestamp, Time duration, Integer shape, Integer performance, Note note) {
 		this(-1, timestamp, duration, shape, performance, note);
 	}
 	
-	public Workout(int øktID, Timestamp timestamp, Time duration, int shape, int performance, Note note) {
+	public Workout(int øktID, Timestamp timestamp, Time duration, Integer shape, Integer performance, Note note) {
 		this.workoutID = øktID;
 		this.timestamp = timestamp;
 		this.duration = duration;
@@ -54,19 +54,19 @@ public class Workout {
 		this.duration = duration;
 	}
 
-	public int getShape() {
+	public Integer getShape() {
 		return shape;
 	}
 
-	public void setShape(int shape) {
+	public void setShape(Integer shape) {
 		this.shape = shape;
 	}
 
-	public int getPerformance() {
+	public Integer getPerformance() {
 		return performance;
 	}
 
-	public void setPerformance(int performance) {
+	public void setPerformance(Integer performance) {
 		this.performance = performance;
 	}
 
@@ -80,7 +80,6 @@ public class Workout {
 
 	@Override
 	public String toString() {
-		return String.format("Workout [workoutID=%s, timestamp=%s, duration=%s, shape=%s, performance=%s, note=%s]",
-				workoutID, timestamp, duration, shape, performance, note);
+		return String.format("#%s - %s", workoutID, timestamp);
 	}
 }

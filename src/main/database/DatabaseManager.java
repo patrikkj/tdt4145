@@ -6,6 +6,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 import java.util.concurrent.Callable;
 
@@ -20,6 +22,7 @@ public class DatabaseManager {
 	private static final String CONNECTION_STRING = "jdbc:mysql://mysql.stud.ntnu.no/" + DB_NAME + "?serverTimezone=UTC";
 	
 	private static Connection connection;
+	private static Instant lastQuery = Instant.now();
 	
 	
 	/*
@@ -288,6 +291,12 @@ public class DatabaseManager {
 			long start = System.nanoTime();
 			result = callable.call();
 			long end = System.nanoTime();
+			
+			Instant now = Instant.now();
+			if (lastQuery.until(now, ChronoUnit.MILLIS) > 2000)
+				System.out.println();
+			lastQuery = now;
+			
 			System.out.format("\tTime: %9.9s seconds   Query: %s%n", (end - start) / Math.pow(10, 9), statement);
 		} catch (Exception e) {
 			throw new RuntimeException(e);

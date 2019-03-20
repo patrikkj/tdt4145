@@ -7,19 +7,19 @@ public class ExercisePerformed {
 	private int exercisePerformedID;
 	private Workout workout;
 	private Exercise exercise;
-	private int numberOfSets;
-	private int numberOfKilos;
+	private Integer numberOfSets;
+	private Integer numberOfKilos;
 	
 	
 	public ExercisePerformed() {
 		this.exercisePerformedID = -1;
 	}
 	
-	public ExercisePerformed(Workout workout, Exercise exercise, int numberOfSets, int numberOfKilos) {
+	public ExercisePerformed(Workout workout, Exercise exercise, Integer numberOfSets, Integer numberOfKilos) {
 		this(-1, workout, exercise, numberOfSets, numberOfKilos);
 	}
 	
-	public ExercisePerformed(int exercisePerformedID, Workout workout, Exercise exercise, int numberOfSets, int numberOfKilos) {
+	public ExercisePerformed(int exercisePerformedID, Workout workout, Exercise exercise, Integer numberOfSets, Integer numberOfKilos) {
 		this.exercisePerformedID = exercisePerformedID;
 		this.workout = workout;
 		this.exercise = exercise;
@@ -52,19 +52,24 @@ public class ExercisePerformed {
 		this.exercise = exercise;
 	}
 
-	public int getNumberOfSets() {
+	public Integer getNumberOfSets() {
 		return numberOfSets;
 	}
 
-	public void setNumberOfSets(int numberOfSets) {
+	public void setNumberOfSets(Integer numberOfSets) {
 		this.numberOfSets = numberOfSets;
 	}
 
-	public int getNumberOfKilos() {
+	public Integer getNumberOfKilos() {
 		return numberOfKilos;
 	}
 
-	public void setNumberOfKilos(int numberOfKilos) {
+	public void setNumberOfKilos(Integer numberOfKilos) {
 		this.numberOfKilos = numberOfKilos;
+	}
+	
+	@Override
+	public String toString() {
+		return String.format("%s - [Sett: %s, Kilo: %s]", exercise.getName(), numberOfSets, numberOfKilos);
 	}
 }

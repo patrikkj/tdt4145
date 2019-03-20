@@ -202,7 +202,7 @@
                               <HBox spacing="10.0">
                                  <children>
                                     <Label maxHeight="1.7976931348623157E308" text="Viser" />
-                                    <JFXTextField fx:id="workoutCountTextField" alignment="CENTER" focusColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="40.0" />
+                                    <JFXTextField fx:id="workoutCountTextField" alignment="CENTER" focusColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" prefWidth="40.0" styleClass="error-text-field" />
                                     <Label layoutX="145.0" layoutY="10.0" maxHeight="1.7976931348623157E308" text="siste treningsøkter." />
                                  </children>
                               </HBox>
@@ -252,7 +252,7 @@
                                           <JFXTimePicker fx:id="startTimePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="2" />
                                           <JFXDatePicker fx:id="endDatePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                           <JFXTimePicker fx:id="endTimePicker" defaultColor="#454545" maxHeight="20.0" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="2" GridPane.rowIndex="1" />
-                                          <JFXComboBox fx:id="exerciseComboBox" focusColor="#454545" maxHeight="20.0" maxWidth="1.7976931348623157E308" minHeight="20.0" prefHeight="20.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
+                                          <JFXComboBox fx:id="exerciseComboBox" focusColor="#454545" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="25.0" GridPane.columnIndex="1" GridPane.columnSpan="2147483647" GridPane.rowIndex="2">
                                              <GridPane.margin>
                                                 <Insets right="5.0" />
                                              </GridPane.margin>
@@ -295,7 +295,7 @@
                                     <HBox spacing="10.0" StackPane.alignment="CENTER">
                                        <children>
                                           <Label maxHeight="1.7976931348623157E308" text="Angi øvelsesgruppe:" />
-                                          <JFXComboBox fx:id="relatedExerciseGroupComboBox" focusColor="#454545" maxHeight="20.0" maxWidth="1.7976931348623157E308" minHeight="20.0" prefHeight="20.0" prefWidth="150.0" />
+                                          <JFXComboBox fx:id="relatedExerciseGroupComboBox" focusColor="#454545" maxHeight="-Infinity" maxWidth="1.7976931348623157E308" minHeight="-Infinity" prefHeight="25.0" prefWidth="150.0" />
                                        </children>
                                     </HBox>
                                  </children>

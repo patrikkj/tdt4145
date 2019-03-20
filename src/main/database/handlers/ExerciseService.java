@@ -8,6 +8,7 @@ import main.database.Record;
 import main.models.Equipment;
 import main.models.Exercise;
 import main.models.ExerciseGroup;
+import main.models.Workout;
 
 public class ExerciseService {
 	// TODO: Might have to use Pair<Class, Object> implementation for null handling
@@ -27,7 +28,9 @@ public class ExerciseService {
 	 * Returns the {@code Exercise} identified by the given {@code exerciseID}.
 	 */
 	public static Exercise getExerciseByID(int exerciseID) {
-		String query = "SELECT * FROM exercise WHERE exercise_id = ?";
+		String query = "SELECT * FROM exercise AS ex "
+				+ "LEFT JOIN equipment AS eq ON ex.equipment_id = eq.equipment_id "
+				+ "WHERE exercise_id = ?";
 		List<Record> records = DatabaseManager.executeQuery(query, exerciseID);
 		return extractExerciseFromRecord(records.get(0));
 	}
@@ -35,11 +38,43 @@ public class ExerciseService {
 	/**
 	 * Returns a list of every exercise within the specified group of exercises.
 	 */
-	public static List<Exercise> getExercisesByGroup(ExerciseGroup exerciseGroup){
-		String query = "SELECT * FROM exercise_included_in AS eii "
-				+ "INNER JOIN exercise AS e ON eii.exercise_id = e.exercise_id "
-				+ "WHERE eii.exercise_group_id = ?";
+	public static List<Exercise> getExercisesInGroup(ExerciseGroup exerciseGroup){
+		String query = "SELECT * FROM exercise AS ex "
+				+ "LEFT JOIN equipment AS eq ON ex.equipment_id = eq.equipment_id "
+				+ "WHERE ex.exercise_id IN "
+				+ "		(SELECT DISTINCT eii.exercise_id FROM exercise_included_in AS eii "
+				+ "		WHERE eii.exercise_group_id = ?)";
 		List<Record> records = DatabaseManager.executeQuery(query, exerciseGroup.getExerciseGroupID());
+		return records.stream()
+				.map(ExerciseService::extractExerciseFromRecord)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Returns a list of every exercise within the specified group of exercises.
+	 */
+	public static List<Exercise> getExercisesInWorkout(Workout workout){
+		String query = "SELECT * FROM exercise AS ex "
+				+ "LEFT JOIN equipment AS eq ON ex.equipment_id = eq.equipment_id "
+				+ "WHERE ex.exercise_id IN "
+				+ "		(SELECT DISTINCT ep.exercise_id FROM exercise_performed AS ep "
+				+ "		WHERE ep.workout_id = ?)";
+		List<Record> records = DatabaseManager.executeQuery(query, workout.getWorkoutID());
+		return records.stream()
+				.map(ExerciseService::extractExerciseFromRecord)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Returns a list of every exercise within the specified group of exercises.
+	 */
+	public static List<Exercise> getExercisesNotInWorkout(Workout workout){
+		String query = "SELECT * FROM exercise AS ex "
+				+ "LEFT JOIN equipment AS eq ON ex.equipment_id = eq.equipment_id "
+				+ "WHERE ex.exercise_id NOT IN "
+				+ "		(SELECT DISTINCT ep.exercise_id FROM exercise_performed AS ep "
+				+ "		WHERE ep.workout_id = ?)";
+		List<Record> records = DatabaseManager.executeQuery(query, workout.getWorkoutID());
 		return records.stream()
 				.map(ExerciseService::extractExerciseFromRecord)
 				.collect(Collectors.toList());

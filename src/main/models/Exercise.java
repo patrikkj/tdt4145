@@ -57,7 +57,6 @@ public class Exercise {
 
 	@Override
 	public String toString() {
-		return String.format("Exercise [exerciseID=%s, name=%s, description=%s, equipment=%s]", exerciseID, name,
-				description, equipment);
+		return name;
 	}
 }

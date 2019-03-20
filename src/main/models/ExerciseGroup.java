@@ -37,6 +37,6 @@ public class ExerciseGroup {
 
 	@Override
 	public String toString() {
-		return String.format("ExerciseGroup [exerciseGroupID=%s, name=%s]", exerciseGroupID, name);
+		return name;
 	}
 }

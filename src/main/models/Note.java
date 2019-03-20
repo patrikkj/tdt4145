@@ -47,6 +47,6 @@ public class Note {
 
 	@Override
 	public String toString() {
-		return String.format("Note [noteID=%s, text=%s]", noteID, text);
+		return title;
 	}
 }

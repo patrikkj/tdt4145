@@ -85,7 +85,7 @@
                               <Insets top="5.0" />
                            </padding>
                         </HBox>
-                        <JFXListView fx:id="exercisePerformedListView" prefHeight="100.0" VBox.vgrow="ALWAYS">
+                        <JFXListView fx:id="exerciseListView" prefHeight="100.0" VBox.vgrow="ALWAYS">
                            <VBox.margin>
                               <Insets top="10.0" />
                            </VBox.margin>
