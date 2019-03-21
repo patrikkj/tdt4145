@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import main.database.DatabaseManager;
 import main.database.Record;
+import main.models.Exercise;
 import main.models.ExerciseGroup;
 
 public class ExerciseGroupService {
@@ -88,5 +89,10 @@ public class ExerciseGroupService {
 	public static void main(String[] args) {
 		insertExerciseGroupAssignID(new ExerciseGroup("Leg exercises"));
 		insertExerciseGroupAssignID(new ExerciseGroup("Abs exercises"));
+	}
+
+	public static List<ExerciseGroup> getExerciseGroupsNotInExercise(Exercise exercise) {
+		// TODO Auto-generated method stub
+		return null;
 	}
 }

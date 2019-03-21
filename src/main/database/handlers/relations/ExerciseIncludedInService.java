@@ -98,4 +98,19 @@ public class ExerciseIncludedInService {
 		
 		return new ExerciseIncludedIn(exerciseIncludedInID, exercise, exerciseGroup);
 	}
+
+	public static List<ExerciseIncludedIn> getExerciseIncludedInRelationsByExercise(Exercise exercise) {
+		// TODO Auto-generated method stub
+		return null;
+	}
+
+	public static void deleteExerciseIncludedInRelationsByExercise(Exercise exercise) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	public static void insertExerciseIncludedInRelations(List<ExerciseIncludedIn> exerciseIncludedInRelations) {
+		// TODO Auto-generated method stub
+		
+	}
 }
