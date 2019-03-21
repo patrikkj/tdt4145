@@ -55,7 +55,7 @@
                               <JFXSlider fx:id="performanceSlider" blockIncrement="1.0" majorTickUnit="1.0" max="10.0" min="1.0" minorTickCount="0" showTickLabels="true" showTickMarks="true" snapToTicks="true" value="5.0" />
                            </children>
                         </VBox>
-                        <JFXComboBox fx:id="noteComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Notat" />
+                        <JFXComboBox fx:id="noteComboBox" editable="true" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Notat" />
                      </children>
                   </VBox>
                   <Separator orientation="VERTICAL" prefHeight="200.0" />
@@ -71,7 +71,7 @@
                         </Label>
                         <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="5.0">
                            <children>
-                              <JFXComboBox fx:id="exerciseComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Øvelse" HBox.hgrow="ALWAYS" />
+                              <JFXComboBox fx:id="exerciseComboBox" editable="true" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Øvelse" HBox.hgrow="ALWAYS" />
                               <JFXButton fx:id="addExercisePerformedButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddExercisePerformedClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
                               <JFXButton fx:id="deleteExercisePerformedButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteExercisePerformedClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
                            </children>

@@ -42,6 +42,7 @@ import javafx.scene.control.TreeItem;
 import javafx.scene.control.TreeTableColumn;
 import javafx.scene.layout.StackPane;
 import javafx.util.Callback;
+import javafx.util.StringConverter;
 import main.app.Loader;
 import main.app.StageManager;
 import main.core.ui.popups.EquipmentPopupController;
@@ -243,7 +244,7 @@ public class MainController implements Refreshable {
 		equipmentListView.setCellFactory(customCellFactory(Equipment::getName));
 		exerciseListView.setCellFactory(customCellFactory(Exercise::getName));
 		exerciseGroupListView.setCellFactory(customCellFactory(ExerciseGroup::getName));
-		workoutListView.setCellFactory(customCellFactory(w -> String.format("#%s - %s", w.getWorkoutID(), w.getTimestamp())));
+		workoutListView.setCellFactory(customCellFactory(Workout::toString));
 		noteListView.setCellFactory(customCellFactory(Note::getTitle));
 	}
     
@@ -280,6 +281,26 @@ public class MainController implements Refreshable {
     }
 
     private void initializeResultLogTable() {
+    	// Change time picker format to 24 hours
+    	startTimePicker.set24HourView(true);
+    	endTimePicker.set24HourView(true);
+    	
+    	// Combo box conversion
+    	exerciseComboBox.setConverter(new StringConverter<Exercise>() {
+			@Override
+			public String toString(Exercise exercise) {
+				return exercise != null ? exercise.getName() : "";
+			}
+			
+			@Override
+			public Exercise fromString(String string) {
+				return exerciseComboBox.getItems().stream()
+						.filter(e -> e.getName().equalsIgnoreCase(string))
+						.findFirst()
+						.orElse(null);
+			}
+		});
+    	
     	// Create changeListener
     	ChangeListener<Object> changeListener = (obs, oldValue, newValue) -> {
     		System.out.format("Null check: %s, isValidResultLog: %s%n", newValue != null, isValidResultLog.get());
@@ -294,7 +315,7 @@ public class MainController implements Refreshable {
     	isValidStartTime = startTimePicker.valueProperty();
     	isValidEndDate = endDatePicker.valueProperty();
     	isValidEndTime = endTimePicker.valueProperty();
-    	isValidExercise = exerciseComboBox.getSelectionModel().selectedItemProperty();
+    	isValidExercise = exerciseComboBox.valueProperty();
     	isValidResultLog = isValidStartDate.isNotNull().and(isValidStartTime.isNotNull())
     			.and(isValidEndDate.isNotNull())
     			.and(isValidEndTime.isNotNull())
@@ -327,9 +348,28 @@ public class MainController implements Refreshable {
     }
 
     private void initializeRelatedExercises() {
-    	relatedExerciseGroupComboBox.getSelectionModel().selectedItemProperty().addListener((obs, oldValue, newValue) -> {
+    	relatedExerciseGroupComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
     		updateRelatedExercises();
     	});
+    	
+    	// Combo box conversion
+//    	relatedExerciseGroupComboBox.getEditor().textProperty().addListener((obs, oldValue, newVaule) -> {
+//    		relatedExerciseGroupComboBox.commitValue();
+//    	});
+    	relatedExerciseGroupComboBox.setConverter(new StringConverter<ExerciseGroup>() {
+			@Override
+			public String toString(ExerciseGroup exerciseGroup) {
+				return exerciseGroup != null ? exerciseGroup.getName() : "";
+			}
+			
+			@Override
+			public ExerciseGroup fromString(String string) {
+				return relatedExerciseGroupComboBox.getItems().stream()
+						.filter(e -> e.getName().equalsIgnoreCase(string))
+						.findFirst()
+						.orElse(null);
+			}
+		});
     }
     
 	@PostInitialize
@@ -436,10 +476,10 @@ public class MainController implements Refreshable {
 				|| startTimePicker.getValue() == null
 				|| endDatePicker.getValue() == null
 				|| endTimePicker.getValue() == null
-				|| exerciseComboBox.getSelectionModel().getSelectedItem() == null)
+				|| exerciseComboBox.getValue() == null)
 			return;
 		
-		Exercise exercise = exerciseComboBox.getSelectionModel().getSelectedItem();
+		Exercise exercise = exerciseComboBox.getValue();
 		Timestamp from = Timestamp.valueOf(LocalDateTime.of(startDatePicker.getValue(), startTimePicker.getValue()));
 		Timestamp to = Timestamp.valueOf(LocalDateTime.of(endDatePicker.getValue(), endTimePicker.getValue()));
 		
@@ -459,7 +499,7 @@ public class MainController implements Refreshable {
 	
 
 	private void updateRelatedExercises() {
-		ExerciseGroup exerciseGroup = relatedExerciseGroupComboBox.getSelectionModel().getSelectedItem();
+		ExerciseGroup exerciseGroup = relatedExerciseGroupComboBox.getValue();
 		
 		if (exerciseGroup != null)
 			relatedExerciseGroupListView.getItems().setAll(ExerciseService.getExercisesInGroup(exerciseGroup));
@@ -617,7 +657,7 @@ public class MainController implements Refreshable {
 			
 			String timestamp = workout.getTimestamp() != null ? new SimpleDateFormat("dd. MMM HH:mm").format(workout.getTimestamp()) : "-";
 			String duration = workout.getDuration() != null ? workout.getDuration().toString() : "-";
-			String note = workout.getNote() != null ? workout.getNote().getText() : "-";
+			String note = workout.getNote() != null ? workout.getNote().getTitle() : "-";
 			
 			this.time = new SimpleStringProperty(timestamp);
 			this.duration = new SimpleStringProperty(duration);

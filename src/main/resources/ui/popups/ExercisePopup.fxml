@@ -28,7 +28,7 @@
                            <children>
                               <JFXTextField fx:id="nameTextField" labelFloat="true" promptText="Navn" styleClass="input-field-light-bg" />
                               <JFXTextArea fx:id="descriptionTextArea" labelFloat="true" prefHeight="100.0" prefWidth="250.0" promptText="Beskrivelse" styleClass="input-field-light-bg" />
-                              <JFXComboBox fx:id="equipmentComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Apparat" />
+                              <JFXComboBox fx:id="equipmentComboBox" editable="true" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Apparat" />
                            </children>
                         </VBox>
                         <Separator orientation="VERTICAL" prefHeight="200.0" />
@@ -44,7 +44,7 @@
                               </Label>
                               <HBox alignment="CENTER_LEFT" fillHeight="false" spacing="5.0">
                                  <children>
-                                    <JFXComboBox fx:id="exerciseGroupComboBox" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Øvelsesgruppe" HBox.hgrow="ALWAYS" />
+                                    <JFXComboBox fx:id="exerciseGroupComboBox" editable="true" focusColor="#454545" labelFloat="true" maxWidth="1.7976931348623157E308" promptText="Øvelsesgruppe" HBox.hgrow="ALWAYS" />
                                     <JFXButton fx:id="addExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleAddExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="add-button-round" text="+" />
                                     <JFXButton fx:id="deleteExerciseGroupButton" alignment="CENTER" buttonType="RAISED" onAction="#handleDeleteExerciseGroupClick" prefHeight="25.0" prefWidth="25.0" styleClass="delete-button-round" text="-" />
                                  </children>

@@ -58,7 +58,6 @@ public class ExercisePerformedService {
 				.collect(Collectors.toList());
 	}
 	
-	
 	/**
 	 * Updates the database record for the exercisePerformed specified.
 	 * @return the number of lines changed.
@@ -103,12 +102,8 @@ public class ExercisePerformedService {
 						ep.getNumberOfKilos()))
 				.collect(Collectors.joining(", "));
 		String update = String.format("INSERT INTO exercise_performed (workout_id, exercise_id, number_of_sets, number_of_kilos) VALUES %s",  values);
-		System.err.println(update);
 		return DatabaseManager.executeUpdate(update);	// Use update for creating normal query (No ID fetch)
 	}
-	
-	
-	
 	
 	/**
 	 * Deletes all records related to the given workout.

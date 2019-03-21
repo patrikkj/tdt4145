@@ -30,6 +30,34 @@ public class ExerciseGroupService {
 	}
 	
 	/**
+	 * Returns a list of every exercise within the specified group of exercises.
+	 */
+	public static List<ExerciseGroup> getExerciseGroupsInExercise(Exercise exercise) {
+		String query = "SELECT * FROM exercise_group AS eg "
+				+ "WHERE eg.exercise_group_id IN "
+				+ "		(SELECT DISTINCT eii.exercise_group_id FROM exercise_included_in AS eii "
+				+ "		WHERE eii.exercise_id = ?)";
+		List<Record> records = DatabaseManager.executeQuery(query, exercise.getExerciseID());
+		return records.stream()
+				.map(ExerciseGroupService::extractExerciseGroupFromRecord)
+				.collect(Collectors.toList());
+	}
+	
+	/**
+	 * Returns a list of every exercise within the specified group of exercises.
+	 */
+	public static List<ExerciseGroup> getExerciseGroupsNotInExercise(Exercise exercise) {
+		String query = "SELECT * FROM exercise_group AS eg "
+				+ "WHERE eg.exercise_group_id NOT IN "
+				+ "		(SELECT DISTINCT eii.exercise_group_id FROM exercise_included_in AS eii "
+				+ "		WHERE eii.exercise_id = ?)";
+		List<Record> records = DatabaseManager.executeQuery(query, exercise.getExerciseID());
+		return records.stream()
+				.map(ExerciseGroupService::extractExerciseGroupFromRecord)
+				.collect(Collectors.toList());
+	}
+
+	/**
 	 * Updates the database record for the exerciseGroup specified.
 	 * @return the number of lines changed.
 	 */
@@ -86,13 +114,10 @@ public class ExerciseGroupService {
 		
 	    return new ExerciseGroup(exerciseGroupID, name);
 	}
+	
 	public static void main(String[] args) {
 		insertExerciseGroupAssignID(new ExerciseGroup("Leg exercises"));
 		insertExerciseGroupAssignID(new ExerciseGroup("Abs exercises"));
 	}
-
-	public static List<ExerciseGroup> getExerciseGroupsNotInExercise(Exercise exercise) {
-		// TODO Auto-generated method stub
-		return null;
+	
 	}
-}

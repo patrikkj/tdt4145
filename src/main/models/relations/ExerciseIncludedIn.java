@@ -48,4 +48,9 @@ public class ExerciseIncludedIn {
 	public void setExerciseGroup(ExerciseGroup exerciseGroup) {
 		this.exerciseGroup = exerciseGroup;
 	}
+	
+	@Override
+	public String toString() {
+		return exerciseGroup.getName();
+	}
 }

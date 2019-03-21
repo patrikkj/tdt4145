@@ -37,6 +37,23 @@ public class ExerciseIncludedInService {
 		List<Record> records = DatabaseManager.executeQuery(query, exerciseIncludedInID);
 		return extractExerciseIncludedInFromRecord(records.get(0));
 	}
+
+	/**
+	 * TODO: WRITE DOC
+	 * @param exercise
+	 * @return
+	 */
+	public static List<ExerciseIncludedIn> getExerciseIncludedInRelationsByExercise(Exercise exercise) {
+		String query = "SELECT * FROM exercise_included_in AS eii "
+				+ "INNER JOIN exercise AS ex ON eii.exercise_id = ex.exercise_id "
+				+ "LEFT JOIN equipment AS eq ON ex.equipment_id = eq.equipment_ID "
+				+ "INNER JOIN exercise_group AS eg ON eii.exercise_group_id = eg.exercise_group_id "
+				+ "WHERE eii.exercise_id = ?";
+		List<Record> records = DatabaseManager.executeQuery(query, exercise.getExerciseID());
+		return records.stream()
+				.map(ExerciseIncludedInService::extractExerciseIncludedInFromRecord)
+				.collect(Collectors.toList());
+	}
 	
 	/**
 	 * Updates the database record for the exerciseIncludedIn specified.
@@ -62,6 +79,22 @@ public class ExerciseIncludedInService {
 		exerciseIncludedIn.setExerciseIncludedInID(exerciseIncludedInID);
 		return exerciseIncludedInID;
 	}
+
+	/**
+	 * TODO: WRITE DOC
+	 * @param exerciseIncludedInRelations
+	 */
+	public static int insertExerciseIncludedInRelations(List<ExerciseIncludedIn> exerciseIncludedInRelations) {
+		if (exerciseIncludedInRelations.isEmpty())
+			return -1;
+		String values = exerciseIncludedInRelations.stream()
+				.map(eii -> String.format("('%s', '%s')", 
+						eii.getExercise().getExerciseID(),				// NOT NULL
+						eii.getExerciseGroup().getExerciseGroupID()))	// NOT NULL
+				.collect(Collectors.joining(", "));
+		String update = String.format("INSERT INTO exercise_included_in (exercise_id, exercise_group_id) VALUES %s",  values);
+		return DatabaseManager.executeUpdate(update);	// Use update for creating normal query (No ID fetch)
+	}
 	
 	/**
 	 * Deletes the database record for the exerciseIncludedIn specified.
@@ -76,7 +109,7 @@ public class ExerciseIncludedInService {
 	 * Deletes the database record for every entity in the list.
 	 * @return the number of lines changed.
 	 */
-	public static int deleteExerciseIncludedIns(List<ExerciseIncludedIn> exerciseIncludedIns) {
+	public static int deleteExerciseIncludedInRelations(List<ExerciseIncludedIn> exerciseIncludedIns) {
 		String parsedIDs = exerciseIncludedIns.stream()
 				.map(e -> String.format("'%s'", e.getExerciseIncludedInID()))
 				.collect(Collectors.joining(", ", "(", ")"));
@@ -84,6 +117,15 @@ public class ExerciseIncludedInService {
 		return DatabaseManager.executeUpdate(delete);
 	}
 
+	/**
+	 * TODO: WRITE DOCS
+	 * @param exercise
+	 */
+	public static int deleteExerciseIncludedInRelationsByExercise(Exercise exercise) {
+		String delete = "DELETE FROM exercise_included_in WHERE exercise_id = ?";
+		return DatabaseManager.executeUpdate(delete, exercise.getExerciseID());
+	}
+	
 	/**
 	 * Creates a new {@code ExerciseIncludedIn} instance from the record specified.
 	 */
@@ -99,18 +141,4 @@ public class ExerciseIncludedInService {
 		return new ExerciseIncludedIn(exerciseIncludedInID, exercise, exerciseGroup);
 	}
 
-	public static List<ExerciseIncludedIn> getExerciseIncludedInRelationsByExercise(Exercise exercise) {
-		// TODO Auto-generated method stub
-		return null;
-	}
-
-	public static void deleteExerciseIncludedInRelationsByExercise(Exercise exercise) {
-		// TODO Auto-generated method stub
-		
-	}
-
-	public static void insertExerciseIncludedInRelations(List<ExerciseIncludedIn> exerciseIncludedInRelations) {
-		// TODO Auto-generated method stub
-		
-	}
 }

@@ -1,6 +1,7 @@
 package main.core.ui.popups;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -14,6 +15,7 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.util.StringConverter;
 import main.database.handlers.EquipmentService;
 import main.database.handlers.ExerciseGroupService;
 import main.database.handlers.ExerciseService;
@@ -41,12 +43,44 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
     @FXML
     private void initialize() {
 		// Disable add button binding
-		addExerciseGroupButton.disableProperty().bind(exerciseGroupComboBox.getSelectionModel().selectedItemProperty().isNull());
+		addExerciseGroupButton.disableProperty().bind(exerciseGroupComboBox.valueProperty().isNull());
 		
 		// Disable delete button binding and permit multi-select
     	exerciseGroupListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
     	exerciseGroupSelectionSize = Bindings.size(exerciseGroupListView.getSelectionModel().getSelectedItems());
     	deleteExerciseGroupButton.disableProperty().bind(exerciseGroupSelectionSize.isEqualTo(0));
+    	
+    	// Combo box conversion
+    	equipmentComboBox.setConverter(new StringConverter<Equipment>() {
+    		@Override
+    		public String toString(Equipment equipment) {
+    			return equipment != null ? equipment.getName() : "";
+    		}
+    		
+    		@Override
+    		public Equipment fromString(String string) {
+    			return equipmentComboBox.getItems().stream()
+    					.filter(e -> e.getName().equalsIgnoreCase(string))
+    					.findFirst()
+    					.orElse(null);
+    		}
+    	});
+    	
+    	// Combo box conversion
+    	exerciseGroupComboBox.setConverter(new StringConverter<ExerciseGroup>() {
+			@Override
+			public String toString(ExerciseGroup exerciseGroup) {
+				return exerciseGroup != null ? exerciseGroup.getName() : "";
+			}
+			
+			@Override
+			public ExerciseGroup fromString(String string) {
+				return exerciseGroupComboBox.getItems().stream()
+						.filter(e -> e.getName().equalsIgnoreCase(string))
+						.findFirst()
+						.orElse(null);
+			}
+		});
     }
     
 	@Override
@@ -108,7 +142,7 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
 	protected void updateModelFromInput() {
 		exercise.setName(nameTextField.getText());
 		exercise.setDescription(descriptionTextArea.getText());
-		exercise.setEquipment(equipmentComboBox.getSelectionModel().getSelectedItem());
+		exercise.setEquipment(equipmentComboBox.getValue());
 	}
 
 	@Override
@@ -124,7 +158,7 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
 
     @FXML
     void handleAddExerciseGroupClick(ActionEvent event) {
-    	ExerciseGroup exerciseGroup = exerciseGroupComboBox.getSelectionModel().getSelectedItem();
+    	ExerciseGroup exerciseGroup = exerciseGroupComboBox.getValue();
     	
     	// Add to ListView
     	exerciseGroupListView.getItems().add(new ExerciseIncludedIn(null, exerciseGroup));
@@ -136,8 +170,12 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
 
     @FXML
     void handleDeleteExerciseGroupClick(ActionEvent event) {
-    	ExerciseIncludedIn selectedExerciseIncludedIn = exerciseGroupListView.getSelectionModel().getSelectedItem();
-    	exerciseGroupListView.getItems().remove(selectedExerciseIncludedIn);
+    	List<ExerciseIncludedIn> selectedExerciseIncludedInRelations = exerciseGroupListView.getSelectionModel().getSelectedItems();
+    	List<ExerciseGroup> exerciseGroupsFromRelation = selectedExerciseIncludedInRelations.stream()
+    			.map(ExerciseIncludedIn::getExerciseGroup)
+    			.collect(Collectors.toList());
+    	exerciseGroupListView.getItems().removeAll(selectedExerciseIncludedInRelations);
+    	exerciseGroupComboBox.getItems().addAll(exerciseGroupsFromRelation);
     }
 	
     @FXML

@@ -2,6 +2,7 @@ package main.models;
 
 import java.sql.Time;
 import java.sql.Timestamp;
+import java.text.SimpleDateFormat;
 
 public class Workout {
 	private int workoutID;
@@ -80,6 +81,7 @@ public class Workout {
 
 	@Override
 	public String toString() {
-		return String.format("#%s - %s", workoutID, timestamp);
+		String timestampString = timestamp != null ? new SimpleDateFormat("dd. MMM HH:mm").format(timestamp) : ""; 
+		return String.format("#%s - %s", workoutID, timestampString);
 	}
 }

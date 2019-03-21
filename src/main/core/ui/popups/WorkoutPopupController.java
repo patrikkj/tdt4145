@@ -6,6 +6,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import com.jfoenix.controls.JFXButton;
 import com.jfoenix.controls.JFXComboBox;
@@ -25,13 +26,16 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
 import javafx.scene.control.SelectionMode;
+import javafx.util.StringConverter;
 import main.database.handlers.ExerciseService;
 import main.database.handlers.NoteService;
 import main.database.handlers.WorkoutService;
 import main.database.handlers.relations.ExercisePerformedService;
 import main.models.Exercise;
+import main.models.ExerciseGroup;
 import main.models.Note;
 import main.models.Workout;
+import main.models.relations.ExerciseIncludedIn;
 import main.models.relations.ExercisePerformed;
 
 public class WorkoutPopupController extends AbstractPopupController<Workout> {
@@ -73,6 +77,8 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     
     @FXML
     private void initialize() {
+    	timeTimePicker.set24HourView(true);
+    	durationTimePicker.set24HourView(true);
     	valuesRequired = new SimpleBooleanProperty();
     	exerciseComboBox.valueProperty().addListener((obs, oldValue, newValue) -> {
     		if (newValue == null  ||  newValue.getEquipment() == null) {
@@ -117,6 +123,40 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 				.or(valuesRequired
 						.and(numberOfSetsIsEmpty
 								.or(numberOfKilosIsEmpty))));
+		
+
+    	// Combo box conversion
+    	noteComboBox.setConverter(new StringConverter<Note>() {
+			@Override
+			public String toString(Note note) {
+				return note != null ? note.getTitle() : "";
+			}
+			
+			@Override
+			public Note fromString(String string) {
+				return noteComboBox.getItems().stream()
+						.filter(n -> n.getTitle().equalsIgnoreCase(string))
+						.findFirst()
+						.orElse(null);
+			}
+		});
+    	
+    	// Combo box conversion
+    	exerciseComboBox.setConverter(new StringConverter<Exercise>() {
+			@Override
+			public String toString(Exercise exercise) {
+				return exercise != null ? exercise.getName() : "";
+			}
+			
+			@Override
+			public Exercise fromString(String string) {
+				return exerciseComboBox.getItems().stream()
+						.filter(e -> e.getName().equalsIgnoreCase(string))
+						.findFirst()
+						.orElse(null);
+			}
+		});
+		
 		
 		// Disable delete button binding and permit multi-select
     	exerciseListView.getSelectionModel().setSelectionMode(SelectionMode.MULTIPLE);
@@ -195,7 +235,7 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 		workout.setDuration(duration != null ? Time.valueOf(duration) : null);
 		workout.setShape((int) shapeSlider.getValue());
 		workout.setPerformance((int) performanceSlider.getValue());
-		workout.setNote(noteComboBox.getSelectionModel().getSelectedItem());
+		workout.setNote(noteComboBox.getValue());
 	}
 
 	@Override
@@ -216,7 +256,7 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 
     @FXML
     void handleAddExercisePerformedClick(ActionEvent event) {
-    	Exercise exercise = exerciseComboBox.getSelectionModel().getSelectedItem();
+    	Exercise exercise = exerciseComboBox.getValue();
     	
     	// Read count value
     	Integer numberOfSets = numberOfSetsTextField.getText() != "" ? Integer.parseInt(numberOfSetsTextField.getText()) : null;
@@ -233,8 +273,12 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
 
     @FXML
     void handleDeleteExercisePerformedClick(ActionEvent event) {
-    	ExercisePerformed selectedExercisePerformed = exerciseListView.getSelectionModel().getSelectedItem();
-    	exerciseListView.getItems().remove(selectedExercisePerformed);
+    	List<ExercisePerformed> selectedExercisePerformedRelations = exerciseListView.getSelectionModel().getSelectedItems();
+    	List<Exercise> exercisesFromRelation = selectedExercisePerformedRelations.stream()
+    			.map(ExercisePerformed::getExercise)
+    			.collect(Collectors.toList());
+    	exerciseListView.getItems().removeAll(selectedExercisePerformedRelations);
+    	exerciseComboBox.getItems().addAll(exercisesFromRelation);
     }
 
     @FXML
