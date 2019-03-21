@@ -50,7 +50,9 @@ public class DatabaseUtil {
 	}
 	
 	protected static void setStatementArgument(PreparedStatement preparedStatement, Object arg, Class<?> type, int paramIndex) throws SQLException {
-		if (arg instanceof String)
+		if (arg == null)
+			preparedStatement.setNull(paramIndex, DatabaseUtil.classToSQLType(type));
+		else if (arg instanceof String)
 			preparedStatement.setString(paramIndex, (String) arg);
 		else if (arg instanceof Double)
 			preparedStatement.setDouble(paramIndex, (Double) arg);

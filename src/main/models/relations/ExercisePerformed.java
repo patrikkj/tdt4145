@@ -70,6 +70,8 @@ public class ExercisePerformed {
 	
 	@Override
 	public String toString() {
-		return String.format("%s - [Sett: %s, Kilo: %s]", exercise.getName(), numberOfSets, numberOfKilos);
+		if (exercise.getEquipment() != null)
+			return String.format("%s - [Sett: %s, Kilo: %s]", exercise.getName(), numberOfSets, numberOfKilos);
+		return exercise.getName();
 	}
 }

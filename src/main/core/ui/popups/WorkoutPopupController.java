@@ -32,10 +32,8 @@ import main.database.handlers.NoteService;
 import main.database.handlers.WorkoutService;
 import main.database.handlers.relations.ExercisePerformedService;
 import main.models.Exercise;
-import main.models.ExerciseGroup;
 import main.models.Note;
 import main.models.Workout;
-import main.models.relations.ExerciseIncludedIn;
 import main.models.relations.ExercisePerformed;
 
 public class WorkoutPopupController extends AbstractPopupController<Workout> {
@@ -259,8 +257,8 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	Exercise exercise = exerciseComboBox.getValue();
     	
     	// Read count value
-    	Integer numberOfSets = numberOfSetsTextField.getText() != "" ? Integer.parseInt(numberOfSetsTextField.getText()) : null;
-    	Integer numberOfKilos = numberOfKilosTextField.getText() != "" ? Integer.parseInt(numberOfKilosTextField.getText()) : null;
+    	Integer numberOfSets = !numberOfSetsTextField.getText().equals("") ? Integer.parseInt(numberOfSetsTextField.getText()) : null;
+    	Integer numberOfKilos = !numberOfKilosTextField.getText().equals("") ? Integer.parseInt(numberOfKilosTextField.getText()) : null;
     	
     	// Add to ListView
     	exerciseListView.getItems().add(new ExercisePerformed(null, exercise, numberOfSets, numberOfKilos));
