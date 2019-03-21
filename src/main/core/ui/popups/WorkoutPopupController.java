@@ -19,7 +19,6 @@ import com.jfoenix.validation.NumberValidator;
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
 import javafx.beans.binding.IntegerBinding;
-import javafx.beans.property.BooleanProperty;
 import javafx.beans.property.ReadOnlyBooleanProperty;
 import javafx.beans.property.SimpleBooleanProperty;
 import javafx.event.ActionEvent;
@@ -37,6 +36,8 @@ import main.models.relations.ExercisePerformed;
 
 public class WorkoutPopupController extends AbstractPopupController<Workout> {
     @FXML private Label headerLabel;
+
+    // Left view
     @FXML private JFXDatePicker dateDatePicker;
     @FXML private JFXTimePicker timeTimePicker;
     @FXML private JFXTimePicker durationTimePicker;
@@ -44,28 +45,29 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     @FXML private JFXSlider performanceSlider;
     @FXML private JFXComboBox<Note> noteComboBox;
 
+
+    // Right view
     @FXML private JFXButton addExercisePerformedButton;
     @FXML private JFXButton deleteExercisePerformedButton;
-
     @FXML private JFXListView<ExercisePerformed> exerciseListView;
     @FXML private JFXComboBox<Exercise> exerciseComboBox;
     @FXML private JFXTextField numberOfSetsTextField;
     @FXML private JFXTextField numberOfKilosTextField;
-    
+
     @FXML private JFXButton actionButton;
-
-
     private Workout workout;
+    
+    // Validation
     private NumberValidator numberOfSetsValidator;
     private NumberValidator numberOfKilosValidator;
     
+    // Properties
     private BooleanBinding isValidExerciseProperty;
     private ReadOnlyBooleanProperty numberOfSetsErrorProperty;
     private ReadOnlyBooleanProperty numberOfKilosErrorProperty;
     private BooleanBinding numberOfSetsIsEmpty;
     private BooleanBinding numberOfKilosIsEmpty;
     private SimpleBooleanProperty valuesRequired;
-
     private IntegerBinding exerciseSelectionSize;
 
     
@@ -219,11 +221,6 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	// Read count value
     	Integer numberOfSets = numberOfSetsTextField.getText() != "" ? Integer.parseInt(numberOfSetsTextField.getText()) : null;
     	Integer numberOfKilos = numberOfKilosTextField.getText() != "" ? Integer.parseInt(numberOfKilosTextField.getText()) : null;
-    	
-//    	if (validator.getHasErrors()  
-//				||  workoutCountTextField.getText() == null  
-//				||  workoutCountTextField.getText().equals(""))
-//			return;
     	
     	// Add to ListView
     	exerciseListView.getItems().add(new ExercisePerformed(null, exercise, numberOfSets, numberOfKilos));
