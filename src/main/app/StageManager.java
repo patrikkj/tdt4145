@@ -80,7 +80,7 @@ public class StageManager {
 		JFXDialog dialog = new JFXDialog(container, (Region) Loader.getParent(view), DialogTransition.CENTER);
 		
 		// Clear and configure controller
-		AbstractPopupController controller = Loader.getController(view);
+		AbstractPopupController<?> controller = Loader.getController(view);
 		controller.clear();
 		controller.connectDialog(dialog);
 		return dialog;
