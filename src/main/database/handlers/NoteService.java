@@ -68,7 +68,7 @@ public class NoteService {
 	 */
 	public static int deleteNotes(List<Note> notes) {
 		String parsedIDs = notes.stream()
-				.map(e -> String.format("'%s'", e.getNoteID()))
+				.map(e -> String.valueOf(e.getNoteID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM note WHERE note_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

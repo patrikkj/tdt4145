@@ -23,7 +23,7 @@ public class EquipmentService {
 	 * Returns the {@code Equipment} identified by the given {@code equipmentID}.
 	 */
 	public static Equipment getEquipmentByID(int equipmentID) {
-		String query = String.format("SELECT * FROM equipment WHERE equipment_id = '%s'", equipmentID);
+		String query = String.format("SELECT * FROM equipment WHERE equipment_id = %s", equipmentID);
 		List<Record> records = DatabaseManager.executeQuery(query);
 		return extractEquipmentFromRecord(records.get(0));
 	}
@@ -68,7 +68,7 @@ public class EquipmentService {
 	 */
 	public static int deleteEquipments(List<Equipment> equipments) {
 		String parsedIDs = equipments.stream()
-				.map(e -> String.format("'%s'", e.getEquipmentID()))
+				.map(e -> String.valueOf(e.getEquipmentID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM equipment WHERE equipment_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

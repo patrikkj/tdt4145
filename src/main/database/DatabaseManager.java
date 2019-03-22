@@ -49,32 +49,36 @@ public class DatabaseManager {
 	
 	
 	// Queries
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return a list of records, where each record represents a row in the returned dataset.
 	 */
 	public static List<Record> executeQuery(String query) {
 		ResultSet resultSet = executeTimedQuery(query);
 		return Record.generateRecords(resultSet);
 	}	
 
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return a list of records, where each record represents a row in the returned dataset.
 	 */
 	public static List<Record> executeQuery(PreparedStatement preparedStatement) {
 		ResultSet resultSet = executeTimedQuery(preparedStatement);
 		return Record.generateRecords(resultSet);
 	}
 
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return a list of records, where each record represents a row in the returned dataset.
 	 */
 	public static List<Record> executeQuery(String preparedStatement, Object... args) {
 		ResultSet resultSet = executeTimedQuery(prepareStatement(preparedStatement, false, args));
 		return Record.generateRecords(resultSet);
 	}
 	
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return a list of records, where each record represents a row in the returned dataset.
 	 */
 	@SafeVarargs
 	public static <T> List<Record> executeQuery(String preparedStatement, Pair<Class<T>, T>... pairs) {
@@ -84,29 +88,33 @@ public class DatabaseManager {
 
 	
 	// Updates
-	/*
+	/**
 	 * Sends update and reestablishes connection if lost.
+	 * @return the number of lines changed.
 	 */
 	public static int executeUpdate(String update) {
 		return executeTimedUpdate(update);
 	}
 
-	/*
+	/**
 	 * Sends update and reestablishes connection if lost.
+	 * @return the number of lines changed.
 	 */
 	public static int executeUpdate(PreparedStatement preparedStatement) {
 		return executeTimedUpdate(preparedStatement);
 	}
 
-	/*
-	 * Sends query and reestablishes connection if lost.
+	/**
+	 * Sends update and reestablishes connection if lost.
+	 * @return the number of lines changed.
 	 */
 	public static int executeUpdate(String preparedStatement, Object... args) {
 		return executeTimedUpdate(prepareStatement(preparedStatement, false, args));
 	}
 	
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return the number of lines changed.
 	 */
 	@SafeVarargs
 	public static <T> int executeUpdate(String preparedStatement, Pair<Class<T>, T>... pairs) {
@@ -115,31 +123,34 @@ public class DatabaseManager {
 
 	
 	// Insertion
-	/*
-	 * Sends update and reestablishes connection if lost.
+	/**
+	 * Sends query and reestablishes connection if lost.
+	 * @return the number of rows affected.
 	 */
 	public static int executeInsertGetID(String insert) {
 		return executeTimedInsertGetID(insert);
 	}
 	
-	/*
-	 * Sends update and reestablishes connection if lost.
+	/**
+	 * Sends query and reestablishes connection if lost.
+	 * @return the number of rows affected.
 	 */
 	public static int executeInsertGetID(PreparedStatement preparedStatement) {
-		// TODO: MUST BE KEYGEN-STATEMENT!!
-
+		// TODO: MUST BE KEYGEN-STATEMENT!
 		return executeTimedInsertGetID(preparedStatement);
 	}
 	
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return the number of rows affected.
 	 */
 	public static int executeInsertGetID(String preparedStatement, Object... args) {
 		return executeTimedInsertGetID(prepareStatement(preparedStatement, true, args));
 	}
 	
-	/*
+	/**
 	 * Sends query and reestablishes connection if lost.
+	 * @return the number of rows affected.
 	 */
 	@SafeVarargs
 	public static <T> int executeInsertGetID(String preparedStatement, Pair<Class<T>, T>... pairs) {

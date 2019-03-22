@@ -88,14 +88,14 @@ public class ExercisePerformedService {
 	}
 	
 	/**
-	 * Inserts a new database record corresponding to the given {@code exercisePerformed}.
-	 * @return the auto-generated identifier.
+	 * Inserts a new record for every relation entity in the list.
+	 * @return the number of lines changed.
 	 */
 	public static int insertExercisePerformedRelations(List<ExercisePerformed> exercisePerformedRelations) {
 		if (exercisePerformedRelations.isEmpty())
 			return -1;
 		String values = exercisePerformedRelations.stream()
-				.map(ep -> String.format("('%s', '%s', '%s', '%s')", 
+				.map(ep -> String.format("(%s, %s, %s, %s)", 
 						ep.getWorkout().getWorkoutID(),				// NOT NULL
 						ep.getExercise().getExerciseID(),			// NOT NULL
 						ep.getNumberOfSets(),
@@ -129,7 +129,7 @@ public class ExercisePerformedService {
 	 */
 	public static int deleteExercisePerformeds(List<ExercisePerformed> exercisePerformeds) {
 		String parsedIDs = exercisePerformeds.stream()
-				.map(e -> String.format("'%s'", e.getExercisePerformedID()))
+				.map(e -> String.format("%s", e.getExercisePerformedID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM exercise_performed WHERE exercise_performed_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

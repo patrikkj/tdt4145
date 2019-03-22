@@ -122,7 +122,7 @@ public class WorkoutService {
 	 */
 	public static int deleteWorkouts(List<Workout> workouts) {
 		String parsedIDs = workouts.stream()
-				.map(e -> String.format("'%s'", e.getWorkoutID()))
+				.map(e -> String.valueOf(e.getWorkoutID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM workout WHERE workout_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

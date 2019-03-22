@@ -30,7 +30,7 @@ public class ExerciseGroupService {
 	}
 	
 	/**
-	 * Returns a list of every exercise within the specified group of exercises.
+	 * Returns a list of every exercise group which is related to the specified exercises.
 	 */
 	public static List<ExerciseGroup> getExerciseGroupsInExercise(Exercise exercise) {
 		String query = "SELECT * FROM exercise_group AS eg "
@@ -44,7 +44,7 @@ public class ExerciseGroupService {
 	}
 	
 	/**
-	 * Returns a list of every exercise within the specified group of exercises.
+	 * Returns a list of every exercise group which is not related to the specified exercises.
 	 */
 	public static List<ExerciseGroup> getExerciseGroupsNotInExercise(Exercise exercise) {
 		String query = "SELECT * FROM exercise_group AS eg "
@@ -95,7 +95,7 @@ public class ExerciseGroupService {
 	 */
 	public static int deleteExerciseGroups(List<ExerciseGroup> exerciseGroups) {
 		String parsedIDs = exerciseGroups.stream()
-				.map(e -> String.format("'%s'", e.getExerciseGroupID()))
+				.map(e -> String.valueOf(e.getExerciseGroupID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM exercise_group WHERE exercise_group_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

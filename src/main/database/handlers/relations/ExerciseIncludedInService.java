@@ -88,7 +88,7 @@ public class ExerciseIncludedInService {
 		if (exerciseIncludedInRelations.isEmpty())
 			return -1;
 		String values = exerciseIncludedInRelations.stream()
-				.map(eii -> String.format("('%s', '%s')", 
+				.map(eii -> String.format("(%s, %s)", 
 						eii.getExercise().getExerciseID(),				// NOT NULL
 						eii.getExerciseGroup().getExerciseGroupID()))	// NOT NULL
 				.collect(Collectors.joining(", "));
@@ -111,7 +111,7 @@ public class ExerciseIncludedInService {
 	 */
 	public static int deleteExerciseIncludedInRelations(List<ExerciseIncludedIn> exerciseIncludedIns) {
 		String parsedIDs = exerciseIncludedIns.stream()
-				.map(e -> String.format("'%s'", e.getExerciseIncludedInID()))
+				.map(e -> String.valueOf(e.getExerciseIncludedInID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM exercise_included_in WHERE exercise_included_in_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);

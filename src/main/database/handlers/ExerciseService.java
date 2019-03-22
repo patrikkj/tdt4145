@@ -11,7 +11,7 @@ import main.models.ExerciseGroup;
 import main.models.Workout;
 
 public class ExerciseService {
-	// TODO: Might have to use Pair<Class, Object> implementation for null handling
+
 	/**
 	 * Returns a list containing every {@code Exercise} entity in the database.
 	 */
@@ -51,7 +51,7 @@ public class ExerciseService {
 	}
 	
 	/**
-	 * Returns a list of every exercise within the specified group of exercises.
+	 * Returns a list of every exercise related to the specified workout.
 	 */
 	public static List<Exercise> getExercisesInWorkout(Workout workout){
 		String query = "SELECT * FROM exercise AS ex "
@@ -66,7 +66,7 @@ public class ExerciseService {
 	}
 	
 	/**
-	 * Returns a list of every exercise within the specified group of exercises.
+	 * Returns a list of every exercise not related to the specified workout.
 	 */
 	public static List<Exercise> getExercisesNotInWorkout(Workout workout){
 		String query = "SELECT * FROM exercise AS ex "
@@ -122,7 +122,7 @@ public class ExerciseService {
 	 */
 	public static int deleteExercises(List<Exercise> exercises) {
 		String parsedIDs = exercises.stream()
-				.map(e -> String.format("'%s'", e.getExerciseID()))
+				.map(e -> String.valueOf(e.getExerciseID()))
 				.collect(Collectors.joining(", ", "(", ")"));
 		String delete = String.format("DELETE FROM exercise WHERE exercise_id IN %s", parsedIDs);
 		return DatabaseManager.executeUpdate(delete);
