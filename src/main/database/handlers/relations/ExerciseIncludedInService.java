@@ -39,9 +39,7 @@ public class ExerciseIncludedInService {
 	}
 
 	/**
-	 * TODO: WRITE DOC
-	 * @param exercise
-	 * @return
+	 * Returns a list of every {@code ExerciseIncludedIn} entity related to the {@code exercise} given.
 	 */
 	public static List<ExerciseIncludedIn> getExerciseIncludedInRelationsByExercise(Exercise exercise) {
 		String query = "SELECT * FROM exercise_included_in AS eii "
