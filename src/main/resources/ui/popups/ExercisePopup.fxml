@@ -15,7 +15,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<StackPane prefWidth="400.0" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/10.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.core.ui.popups.ExercisePopupController">
+<StackPane prefWidth="400.0" stylesheets="@../../stylesheet.css" xmlns="http://javafx.com/javafx/9.0.0" xmlns:fx="http://javafx.com/fxml/1" fx:controller="main.core.ui.popups.ExercisePopupController">
    <children>
       <StackPane stylesheets="@../../stylesheet.css">
          <children>
