@@ -8,6 +8,7 @@ public abstract class AbstractPopupController<T> implements Refreshable {
 	protected JFXDialog dialog;
 	protected Mode mode;
 	
+	
 	/**
 	 * Prepares popup for creating a new model. This method must be called
 	 * prior to displaying the dialog box.

@@ -36,6 +36,7 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
     @FXML private JFXListView<ExerciseIncludedIn> exerciseGroupListView;
     @FXML private JFXButton actionButton;
     
+    
     private IntegerBinding exerciseGroupSelectionSize;
 
     private Exercise exercise;
@@ -154,7 +155,6 @@ public class ExercisePopupController extends AbstractPopupController<Exercise> {
 		exerciseGroupComboBox.getItems().clear();
 		exerciseGroupListView.getItems().clear();
 	}
-
 
     @FXML
     void handleAddExerciseGroupClick(ActionEvent event) {

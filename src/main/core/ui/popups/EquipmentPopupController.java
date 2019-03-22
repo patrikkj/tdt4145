@@ -17,6 +17,7 @@ public class EquipmentPopupController extends AbstractPopupController<Equipment>
     @FXML private JFXButton actionButton;
     private Equipment equipment;
 
+    
 	@Override
 	public void loadCreateMode() {
 		setMode(Mode.CREATE);

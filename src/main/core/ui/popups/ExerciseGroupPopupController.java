@@ -15,6 +15,7 @@ public class ExerciseGroupPopupController extends AbstractPopupController<Exerci
     @FXML private JFXButton actionButton;
     private ExerciseGroup exerciseGroup;
 
+    
 	@Override
 	public void loadCreateMode() {
 		setMode(Mode.CREATE);

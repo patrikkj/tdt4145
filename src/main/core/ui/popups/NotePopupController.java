@@ -17,6 +17,7 @@ public class NotePopupController extends AbstractPopupController<Note> {
     @FXML private JFXButton actionButton;
     private Note note;
 
+    
 	@Override
 	public void loadCreateMode() {
 		setMode(Mode.CREATE);

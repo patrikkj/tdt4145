@@ -47,7 +47,6 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     @FXML private JFXSlider performanceSlider;
     @FXML private JFXComboBox<Note> noteComboBox;
 
-
     // Right view
     @FXML private JFXButton addExercisePerformedButton;
     @FXML private JFXButton deleteExercisePerformedButton;
@@ -250,7 +249,6 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	numberOfSetsTextField.clear();
     	numberOfKilosTextField.clear();
 	}
-	
 
     @FXML
     void handleAddExercisePerformedClick(ActionEvent event) {
@@ -267,7 +265,6 @@ public class WorkoutPopupController extends AbstractPopupController<Workout> {
     	exerciseComboBox.getItems().remove(exercise);
     	exerciseComboBox.getSelectionModel().clearSelection();
     }
-    
 
     @FXML
     void handleDeleteExercisePerformedClick(ActionEvent event) {
