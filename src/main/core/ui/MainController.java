@@ -21,7 +21,6 @@ import com.jfoenix.controls.JFXTreeTableView;
 import com.jfoenix.controls.RecursiveTreeItem;
 import com.jfoenix.controls.datamodels.treetable.RecursiveTreeObject;
 import com.jfoenix.validation.NumberValidator;
-import com.jfoenix.validation.base.ValidatorBase;
 
 import javafx.beans.binding.Bindings;
 import javafx.beans.binding.BooleanBinding;
@@ -148,7 +147,6 @@ public class MainController implements Refreshable {
     private IntegerBinding exerciseGroupSelectionSize;
     private IntegerBinding workoutSelectionSize;
     private IntegerBinding noteSelectionSize;
-    
     
     
     @FXML
@@ -495,8 +493,6 @@ public class MainController implements Refreshable {
 		resultLogTreeTableView.getSelectionModel().clearSelection();
 		resultLogTreeTableView.getSortOrder().clear();		
 	}
-	
-	
 
 	private void updateRelatedExercises() {
 		ExerciseGroup exerciseGroup = relatedExerciseGroupComboBox.getValue();
@@ -506,7 +502,6 @@ public class MainController implements Refreshable {
 		else
 			relatedExerciseGroupListView.getItems().clear();
 	}
-	
 	
 	
 	private <T> Callback<ListView<T>, ListCell<T>> customCellFactory(Function<T, String> nameFunction) {
@@ -665,24 +660,6 @@ public class MainController implements Refreshable {
 			this.performance = new SimpleStringProperty(String.valueOf(workout.getPerformance()));
 			this.note = new SimpleStringProperty(note);
 		}
-    }
-
-    /**
-     * Custom implementation of {@link ValidatorBase} where errors can be triggered manually.
-     */
-    private class FieldValidator extends ValidatorBase {
-    	
-    	public FieldValidator() {
-    		
-    	}
-    	
-    	@Override
-    	protected void eval() {
-    	}
-    	
-    	public void setError(boolean error) {
-    		hasErrors.set(error);
-    	}
     }
 
     public enum Entity {
